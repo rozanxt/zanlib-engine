@@ -3,15 +3,22 @@ package zan.engine.core;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
 
 public class Window {
 
 	public static class Attributes {
 		public String title = "";
+		public String icon = "";
 
 		public int x = GLFW_DONT_CARE;
 		public int y = GLFW_DONT_CARE;
@@ -77,6 +84,8 @@ public class Window {
 			attr.y = (vidmode.height() - attr.height) / 2;
 		}
 		glfwSetWindowPos(handle, attr.x, attr.y);
+
+		setIcon(attr.icon);
 	}
 
 	private void initCallbacks() {
@@ -125,6 +134,24 @@ public class Window {
 
 	public String getTitle() {
 		return attr.title;
+	}
+
+	public void setIcon(String icon) {
+		attr.icon = icon;
+		if (!icon.isEmpty()) {
+			try (MemoryStack stack = MemoryStack.stackPush()) {
+				IntBuffer w = stack.mallocInt(1);
+				IntBuffer h = stack.mallocInt(1);
+				IntBuffer c = stack.mallocInt(1);
+				ByteBuffer ico = stbi_load(icon, w, h, c, 4);
+				glfwSetWindowIcon(handle, GLFWImage.mallocStack(1, stack).width(w.get(0)).height(h.get(0)).pixels(ico));
+				stbi_image_free(ico);
+			}
+		}
+	}
+
+	public String getIcon() {
+		return attr.icon;
 	}
 
 	public void setPos(int x, int y) {
