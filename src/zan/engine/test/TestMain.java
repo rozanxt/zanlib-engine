@@ -11,7 +11,7 @@ public class TestMain {
 		attr.icon = "res/ico/icon.png";
 		Engine engine = new Engine();
 		engine.setWindow(new Window(attr));
-		engine.setModule(new TestModule());
+		engine.setModule(new TestModule(engine));
 		engine.start();
 	}
 
