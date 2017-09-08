@@ -11,7 +11,7 @@ public class TextureObject extends VertexObject {
 
 	@Override
 	public void render() {
-		if (texture.isValid()) texture.bind();
+		texture.bind();
 		super.render();
 		texture.unbind();
 	}

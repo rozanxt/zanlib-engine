@@ -17,11 +17,12 @@ import zan.engine.util.ResourceUtil;
 
 public class ShaderProgram {
 
-	protected final Map<String, Integer> uniforms = new HashMap<>();
+	protected final Map<String, Integer> uniforms;
 
 	protected final int program;
 
 	public ShaderProgram(String vertexSource, String fragmentSource) {
+		uniforms = new HashMap<>();
 		program = glCreateProgram();
 		createProgram(vertexSource, fragmentSource);
 	}

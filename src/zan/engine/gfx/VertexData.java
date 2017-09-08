@@ -10,18 +10,18 @@ import org.lwjgl.system.MemoryUtil;
 
 public abstract class VertexData {
 
-	protected final int vertexCount;
-
 	protected final int vao;
 	protected final int[] vbo;
 
+	protected final int vertexCount;
+
 	public VertexData(int vertexCount, int vboCount) {
-		this.vertexCount = vertexCount;
 		vao = glGenVertexArrays();
 		vbo = new int[vboCount];
 		for (int i = 0; i < vbo.length; i++) {
 			vbo[i] = glGenBuffers();
 		}
+		this.vertexCount = vertexCount;
 	}
 
 	public void delete() {
@@ -31,16 +31,16 @@ public abstract class VertexData {
 		glDeleteVertexArrays(vao);
 	}
 
-	public int getVertexCount() {
-		return vertexCount;
-	}
-
 	public int getVAO() {
 		return vao;
 	}
 
 	public int getVBO(int index) {
 		return vbo[index];
+	}
+
+	public int getVertexCount() {
+		return vertexCount;
 	}
 
 	protected void sendBufferData(int index, int[] data, int target) {
