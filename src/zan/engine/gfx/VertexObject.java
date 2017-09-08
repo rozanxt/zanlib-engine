@@ -11,13 +11,18 @@ public class VertexObject implements RenderObject {
 	protected final int count;
 	protected final int offset;
 
-	public VertexObject(VertexData vertexData, int mode, int count, int offset) {
-		this.data = vertexData;
+	public VertexObject(VertexData data, int mode, int count, int offset) {
+		this.data = data;
 		this.mode = mode;
 		this.count = count;
 		this.offset = offset;
 	}
 
+	public VertexObject(VertexData data) {
+		this(data, GL_TRIANGLES, data.getVertexCount(), 0);
+	}
+
+	@Override
 	public void render() {
 		glBindVertexArray(data.getVAO());
 		glDrawElements(mode, count, GL_UNSIGNED_INT, offset);

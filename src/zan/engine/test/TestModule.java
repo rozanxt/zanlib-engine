@@ -3,14 +3,16 @@ package zan.engine.test;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
+import org.joml.Matrix4f;
+
 import zan.engine.core.Engine;
 import zan.engine.core.Module;
 import zan.engine.gfx.MeshData;
 import zan.engine.gfx.RenderObject;
 import zan.engine.gfx.ShaderProgram;
+import zan.engine.gfx.Texture;
+import zan.engine.gfx.TextureObject;
 import zan.engine.gfx.VertexData;
-import zan.engine.gfx.VertexObject;
-import zan.engine.util.ResourceUtil;
 
 public class TestModule implements Module {
 
@@ -19,6 +21,8 @@ public class TestModule implements Module {
 	private ShaderProgram shader;
 
 	private VertexData mesh;
+
+	private Texture texture;
 
 	private RenderObject object;
 
@@ -37,7 +41,13 @@ public class TestModule implements Module {
 			}
 		});
 
-		shader = new ShaderProgram(ResourceUtil.getTextResourceAsString("res/shd/shader.vs"), ResourceUtil.getTextResourceAsString("res/shd/shader.fs"));
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		shader = ShaderProgram.loadShader("res/shd/shader.vs", "res/shd/shader.fs");
+		shader.addUniform("projectionMatrix");
+		shader.addUniform("modelViewMatrix");
+		shader.addUniform("textureUnit");
 
 		float[] positions = new float[] {
 			-0.5f, -0.5f, 0.0f,
@@ -45,15 +55,22 @@ public class TestModule implements Module {
 			0.5f, 0.5f, 0.0f,
 			-0.5f, 0.5f, 0.0f,
 		};
-		float[] texcoords = new float[0];
+		float[] texcoords = new float[] {
+			0.0f, 1.0f,
+			1.0f, 1.0f,
+			1.0f, 0.0f,
+			0.0f, 0.0f,
+		};
 		float[] normals = new float[0];
 		int[] indices = { 0, 1, 3, 2, 3, 1 };
 		mesh = new MeshData(positions, texcoords, normals, indices);
-		object = new VertexObject(mesh, GL_TRIANGLES, mesh.getVertexCount(), 0);
+		texture = Texture.loadTexture("res/ico/icon.png");
+		object = new TextureObject(mesh, texture);
 	}
 
 	@Override
 	public void exit() {
+		texture.delete();
 		mesh.delete();
 		shader.delete();
 	}
@@ -75,6 +92,9 @@ public class TestModule implements Module {
 		glViewport(0, 0, engine.getWindow().getWidth(), engine.getWindow().getHeight());
 
 		shader.bind();
+		shader.setUniform("projectionMatrix", new Matrix4f());
+		shader.setUniform("modelViewMatrix", new Matrix4f());
+		shader.setUniform("textureUnit", 0);
 		object.render();
 		shader.unbind();
 	}
