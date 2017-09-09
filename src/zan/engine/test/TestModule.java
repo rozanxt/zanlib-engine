@@ -18,6 +18,9 @@ import zan.engine.gfx.TextureData;
 import zan.engine.gfx.TextureObject;
 import zan.engine.gfx.VertexData;
 import zan.engine.gfx.VertexObject;
+import zan.engine.sfx.SoundData;
+import zan.engine.sfx.SoundDevice;
+import zan.engine.sfx.SoundSource;
 import zan.engine.util.OBJLoader;
 
 public class TestModule implements Module {
@@ -35,6 +38,10 @@ public class TestModule implements Module {
 
 	private VertexObject cube;
 	private VertexObject text;
+
+	private SoundDevice device;
+	private SoundData music;
+	private SoundSource source;
 
 	private float rotationX = 30.0f;
 	private float rotationY = 60.0f;
@@ -73,6 +80,10 @@ public class TestModule implements Module {
 		font[2] = FontData.create(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
 		font[3] = FontData.create(new Font(Font.SANS_SERIF, Font.BOLD + Font.ITALIC, 20));
 		text = TextObject.create("ZanEngine", font[0], 550);
+
+		device = new SoundDevice();
+		music = SoundData.loadFromFile("res/snd/humoresky.ogg");
+		source = new SoundSource(music);
 	}
 
 	@Override
@@ -86,6 +97,9 @@ public class TestModule implements Module {
 		}
 		cube.delete();
 		text.delete();
+		source.delete();
+		music.delete();
+		device.delete();
 	}
 
 	@Override
@@ -97,6 +111,21 @@ public class TestModule implements Module {
 		}
 		if (input.isKeyReleased(GLFW_KEY_F11)) {
 			engine.getWindow().setFullScreen(!engine.getWindow().isFullScreen());
+		}
+
+		if (input.isKeyReleased(GLFW_KEY_ENTER)) {
+			if (source.isInitial()) {
+				source.play();
+			} else if (source.isPlaying()) {
+				source.pause();
+			} else if (source.isPaused()) {
+				source.resume();
+			} else if (source.isStopped()) {
+				source.rewind();
+			}
+		}
+		if (input.isKeyReleased(GLFW_KEY_BACKSPACE)) {
+			source.stop();
 		}
 
 		if (input.isKeyPressed(GLFW_KEY_0)) {
