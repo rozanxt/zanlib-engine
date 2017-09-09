@@ -1,21 +1,20 @@
 package zan.engine.gfx;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.stb.STBImage.stbi_image_free;
-import static org.lwjgl.stb.STBImage.stbi_load;
+import static org.lwjgl.stb.STBImage.*;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.system.MemoryStack;
 
-public class Texture {
+public class TextureData {
 
 	protected final int id;
 	protected final int width;
 	protected final int height;
 
-	public Texture(ByteBuffer data, int width, int height) {
+	public TextureData(ByteBuffer data, int width, int height) {
 		this.id = glGenTextures();
 		this.width = width;
 		this.height = height;
@@ -26,16 +25,16 @@ public class Texture {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	public void delete() {
+		glDeleteTextures(id);
+	}
+
 	public void bind() {
 		glBindTexture(GL_TEXTURE_2D, id);
 	}
 
 	public void unbind() {
 		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-
-	public void delete() {
-		glDeleteTextures(id);
 	}
 
 	public int getID() {
@@ -50,14 +49,14 @@ public class Texture {
 		return height;
 	}
 
-	public static Texture loadTexture(String path) {
-		Texture texture = null;
+	public static TextureData loadFromFile(String path) {
+		TextureData texture = null;
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer w = stack.mallocInt(1);
 			IntBuffer h = stack.mallocInt(1);
 			IntBuffer c = stack.mallocInt(1);
 			ByteBuffer data = stbi_load(path, w, h, c, 4);
-			texture = new Texture(data, w.get(), h.get());
+			texture = new TextureData(data, w.get(), h.get());
 			stbi_image_free(data);
 		}
 		return texture;

@@ -2,9 +2,9 @@ package zan.engine.gfx;
 
 public class TextureObject extends VertexObject {
 
-	protected Texture texture;
+	protected final TextureData texture;
 
-	public TextureObject(VertexData data, Texture texture) {
+	public TextureObject(VertexData data, TextureData texture) {
 		super(data);
 		this.texture = texture;
 	}

@@ -1,6 +1,7 @@
 package zan.engine.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.joml.Vector2f;
@@ -49,11 +50,15 @@ public final class OBJLoader {
 
 	}
 
-	public static MeshData loadOBJ(String path) {
-		return loadOBJ(ResourceUtil.getTextResourceAsStringList(path));
+	public static MeshData loadFromFile(String path) {
+		return parseOBJ(ResourceUtil.getTextResourceAsStringList(path));
 	}
 
-	public static MeshData loadOBJ(List<String> data) {
+	public static MeshData parseOBJ(String data) {
+		return parseOBJ(Arrays.asList(data.split("\n")));
+	}
+
+	public static MeshData parseOBJ(List<String> data) {
 		List<Vector3f> positions = new ArrayList<>();
 		List<Vector2f> texcoords = new ArrayList<>();
 		List<Vector3f> normals = new ArrayList<>();

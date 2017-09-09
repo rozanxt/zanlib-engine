@@ -27,16 +27,16 @@ public class ShaderProgram {
 		createProgram(vertexSource, fragmentSource);
 	}
 
+	public void delete() {
+		glDeleteProgram(program);
+	}
+
 	public void bind() {
 		glUseProgram(program);
 	}
 
 	public void unbind() {
 		glUseProgram(0);
-	}
-
-	public void delete() {
-		glDeleteProgram(program);
 	}
 
 	public void addUniform(String uniform) {
@@ -102,7 +102,7 @@ public class ShaderProgram {
 		glDeleteShader(shader);
 	}
 
-	public static ShaderProgram loadShader(String vertexPath, String fragmentPath) {
+	public static ShaderProgram loadFromFile(String vertexPath, String fragmentPath) {
 		return new ShaderProgram(ResourceUtil.getTextResourceAsString(vertexPath), ResourceUtil.getTextResourceAsString(fragmentPath));
 	}
 

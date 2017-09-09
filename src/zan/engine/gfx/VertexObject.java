@@ -3,7 +3,7 @@ package zan.engine.gfx;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class VertexObject implements RenderObject {
+public class VertexObject {
 
 	protected final VertexData data;
 
@@ -22,7 +22,10 @@ public class VertexObject implements RenderObject {
 		this(data, GL_TRIANGLES, data.getVertexCount(), 0);
 	}
 
-	@Override
+	public void delete() {
+
+	}
+
 	public void render() {
 		glBindVertexArray(data.getVAO());
 		glDrawElements(mode, count, GL_UNSIGNED_INT, offset);

@@ -13,29 +13,29 @@ public final class ResourceUtil {
 	}
 
 	public static String getTextResourceAsString(String path) {
-		StringBuilder data = new StringBuilder();
+		StringBuilder text = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				data.append(line).append('\n');
+				text.append(line).append('\n');
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return data.toString();
+		return text.toString();
 	}
 
 	public static List<String> getTextResourceAsStringList(String path) {
-		List<String> data = new ArrayList<>();
+		List<String> text = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				data.add(line);
+				text.add(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return data;
+		return text;
 	}
 
 }
