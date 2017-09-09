@@ -6,8 +6,6 @@ public interface Module {
 
 	void exit();
 
-	void input();
-
 	void update();
 
 	void render();

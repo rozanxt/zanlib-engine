@@ -11,6 +11,7 @@ public class Engine implements Runnable {
 	private final Thread thread = new Thread(this, "engine");
 
 	private Window window = null;
+	private Input input = null;
 	private Module module = null;
 
 	private int targetFPS = 60;
@@ -39,6 +40,8 @@ public class Engine implements Runnable {
 		GLFWErrorCallback.createPrint(System.err).set();
 		if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW!");
 		window.init();
+		input = new Input(window);
+		input.init();
 		if (module != null) module.init();
 	}
 
@@ -59,10 +62,9 @@ public class Engine implements Runnable {
 			updateTime += elapsedTime;
 			nextFrame += deltaFPS;
 
-			if (module != null) module.input();
-
 			while (updateTime >= deltaUPS) {
 				if (module != null) module.update();
+				input.clear();
 				updateTime -= deltaUPS;
 				countUPS++;
 			}
@@ -105,6 +107,14 @@ public class Engine implements Runnable {
 
 	public Window getWindow() {
 		return window;
+	}
+
+	public void setInput(Input input) {
+		this.input = input;
+	}
+
+	public Input getInput() {
+		return input;
 	}
 
 	public void setModule(Module module) {
