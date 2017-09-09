@@ -15,7 +15,7 @@ public class TextureData {
 	protected final int height;
 
 	public TextureData(ByteBuffer data, int width, int height) {
-		this.id = glGenTextures();
+		id = glGenTextures();
 		this.width = width;
 		this.height = height;
 		glBindTexture(GL_TEXTURE_2D, id);

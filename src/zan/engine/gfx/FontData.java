@@ -12,6 +12,8 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.lwjgl.system.MemoryUtil;
+
 import zan.engine.util.ConversionUtil;
 
 public class FontData extends TextureData {
@@ -51,10 +53,10 @@ public class FontData extends TextureData {
 				sb.append(c).append(' ');
 			}
 		}
-		String infoChars = sa.toString();
+		String metricsChars = sa.toString();
 		String textureChars = sb.toString();
 
-		Map<Character, CharData> fontInfo = new HashMap<>();
+		Map<Character, CharData> charData = new HashMap<>();
 		int width = 0;
 		int height = 0;
 
@@ -66,9 +68,9 @@ public class FontData extends TextureData {
 		if (font.isItalic()) {
 			padding = 1;
 		}
-		for (char c : infoChars.toCharArray()) {
+		for (char c : metricsChars.toCharArray()) {
 			CharData cd = new CharData(width, fm.charWidth(c) + padding);
-			fontInfo.put(c, cd);
+			charData.put(c, cd);
 			width += fm.charWidth(c) + fm.charWidth(' ');
 			height = Math.max(height, fm.getHeight());
 		}
@@ -83,7 +85,10 @@ public class FontData extends TextureData {
 		g2d.drawString(textureChars, 0, fm.getAscent());
 		g2d.dispose();
 
-		return new FontData(ConversionUtil.BufferedImageToByteBuffer(bi), bi.getWidth(), bi.getHeight(), fontInfo);
+		ByteBuffer buffer = ConversionUtil.BufferedImageToByteBuffer(bi);
+		FontData result = new FontData(buffer, bi.getWidth(), bi.getHeight(), charData);
+		MemoryUtil.memFree(buffer);
+		return result;
 	}
 
 }
