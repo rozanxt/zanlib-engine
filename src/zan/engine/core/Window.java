@@ -35,6 +35,8 @@ public class Window {
 		public boolean autoiconify = true;
 		public boolean floating = false;
 		public boolean maximized = false;
+		public boolean minimized = false;
+		public boolean visible = true;
 	}
 
 	private final Attributes attr;
@@ -71,7 +73,9 @@ public class Window {
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
 		if (attr.fullscreen) {
-			handle = glfwCreateWindow(vidmode.width(), vidmode.height(), attr.title, glfwGetPrimaryMonitor(), NULL);
+			width = vidmode.width();
+			height = vidmode.height();
+			handle = glfwCreateWindow(width, height, attr.title, glfwGetPrimaryMonitor(), NULL);
 		} else {
 			handle = glfwCreateWindow(attr.width, attr.height, attr.title, NULL, NULL);
 		}
@@ -114,7 +118,8 @@ public class Window {
 	}
 
 	private void initFinish() {
-		glfwShowWindow(handle);
+		if (attr.minimized) glfwIconifyWindow(handle);
+		if (attr.visible) glfwShowWindow(handle);
 	}
 
 	public void refresh() {

@@ -8,8 +8,6 @@ public class Engine implements Runnable {
 
 	private static final long NANOS_PER_SECOND = 1_000_000_000L;
 
-	private final Thread thread = new Thread(this, "engine");
-
 	private Window window = null;
 	private Input input = null;
 	private Module module = null;
@@ -21,6 +19,7 @@ public class Engine implements Runnable {
 	private int currentUPS = 0;
 
 	public void start() {
+		Thread thread = new Thread(this, "engine");
 		String os = System.getProperty("os.name");
 		if (os.contains("Mac")) {
 			thread.run();
@@ -39,9 +38,8 @@ public class Engine implements Runnable {
 	private void init() {
 		GLFWErrorCallback.createPrint(System.err).set();
 		if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW!");
-		window.init();
-		input = new Input(window);
-		input.init();
+		if (window != null) window.init();
+		if (input != null) input.init();
 		if (module != null) module.init();
 	}
 
@@ -53,7 +51,7 @@ public class Engine implements Runnable {
 		int countFPS = 0;
 		int countUPS = 0;
 
-		while (!window.shouldClose()) {
+		while (window != null && !window.shouldClose()) {
 			long deltaFPS = NANOS_PER_SECOND / targetFPS;
 			long deltaUPS = NANOS_PER_SECOND / targetUPS;
 			long currentTime = System.nanoTime();
@@ -64,7 +62,7 @@ public class Engine implements Runnable {
 
 			while (updateTime >= deltaUPS) {
 				if (module != null) module.update();
-				input.clear();
+				if (input != null) input.clear();
 				updateTime -= deltaUPS;
 				countUPS++;
 			}
@@ -96,7 +94,8 @@ public class Engine implements Runnable {
 
 	private void exit() {
 		if (module != null) module.exit();
-		window.exit();
+		if (input != null) input.exit();
+		if (window != null) window.exit();
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
 	}

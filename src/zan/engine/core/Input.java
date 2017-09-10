@@ -90,9 +90,7 @@ public class Input {
 
 	public void init() {
 		glfwSetKeyCallback(window.getHandle(), (window, key, scancode, action, mods) -> {
-			if (key == GLFW_KEY_UNKNOWN) {
-				return;
-			}
+			if (key == GLFW_KEY_UNKNOWN) return;
 			KeyEvent keyEvent = keyEvents[key];
 			keyEvent.mods = mods;
 			switch (action) {
@@ -108,9 +106,7 @@ public class Input {
 			}
 		});
 		glfwSetMouseButtonCallback(window.getHandle(), (window, button, action, mods) -> {
-			if (button == GLFW_KEY_UNKNOWN) {
-				return;
-			}
+			if (button == GLFW_KEY_UNKNOWN) return;
 			MouseEvent mouseEvent = mouseEvents[button];
 			mouseEvent.mods = mods;
 			switch (action) {
@@ -144,8 +140,36 @@ public class Input {
 		});
 	}
 
+	public void exit() {
+
+	}
+
 	public void setMouseMode(int mode) {
 		glfwSetInputMode(window.getHandle(), GLFW_CURSOR, mode);
+	}
+
+	public float getMouseX() {
+		return mouseX;
+	}
+
+	public float getMouseY() {
+		return mouseY;
+	}
+
+	public float getMouseDeltaX() {
+		return mouseDeltaX;
+	}
+
+	public float getMouseDeltaY() {
+		return mouseDeltaY;
+	}
+
+	public float getMouseScrollX() {
+		return mouseScrollX;
+	}
+
+	public float getMouseScrollY() {
+		return mouseScrollY;
 	}
 
 	public boolean isKeyMods(int key, int mods) {
@@ -190,30 +214,6 @@ public class Input {
 
 	public boolean hasMouseLeft() {
 		return mouseLeft;
-	}
-
-	public float getMouseX() {
-		return mouseX;
-	}
-
-	public float getMouseY() {
-		return mouseY;
-	}
-
-	public float getMouseDeltaX() {
-		return mouseDeltaX;
-	}
-
-	public float getMouseDeltaY() {
-		return mouseDeltaY;
-	}
-
-	public float getMouseScrollX() {
-		return mouseScrollX;
-	}
-
-	public float getMouseScrollY() {
-		return mouseScrollY;
 	}
 
 }
