@@ -8,44 +8,48 @@ import org.joml.Vector3f;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 
-public class SoundDevice {
+public final class Sound {
 
-	private final long device;
-	private final long context;
+	private static long device;
+	private static long context;
 
-	public SoundDevice() {
+	private Sound() {
+
+	}
+
+	public static void init() {
 		device = alcOpenDevice(alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER));
 		context = alcCreateContext(device, new int[] { 0 });
 		alcMakeContextCurrent(context);
 		AL.createCapabilities(ALC.createCapabilities(device));
 	}
 
-	public void delete() {
+	public static void exit() {
 		alcDestroyContext(context);
 		alcCloseDevice(device);
 	}
 
-	public void setDistanceModel(int model) {
+	public static void setDistanceModel(int model) {
 		alDistanceModel(model);
 	}
 
-	public void setDopplerFactor(float factor) {
+	public static void setDopplerFactor(float factor) {
 		alDopplerFactor(factor);
 	}
 
-	public void setSoundSpeed(float speed) {
+	public static void setSoundSpeed(float speed) {
 		alSpeedOfSound(speed);
 	}
 
-	public void setListenerPosition(Vector3f position) {
+	public static void setListenerPosition(Vector3f position) {
 		alListener3f(AL_POSITION, position.x, position.y, position.z);
 	}
 
-	public void setListenerVelocity(Vector3f velocity) {
+	public static void setListenerVelocity(Vector3f velocity) {
 		alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 	}
 
-	public void setListenerOrientation(Vector3f at, Vector3f up) {
+	public static void setListenerOrientation(Vector3f at, Vector3f up) {
 		float[] orientation = new float[6];
 		orientation[0] = at.x;
 		orientation[1] = at.y;

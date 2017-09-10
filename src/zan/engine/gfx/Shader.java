@@ -13,15 +13,15 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 
-import zan.engine.util.ResourceUtil;
+import zan.engine.util.TextResource;
 
-public class ShaderProgram {
+public class Shader {
 
-	protected final Map<String, Integer> uniforms;
+	private final Map<String, Integer> uniforms;
 
-	protected final int program;
+	private final int program;
 
-	public ShaderProgram(String vertexSource, String fragmentSource) {
+	public Shader(String vertexSource, String fragmentSource) {
 		uniforms = new HashMap<>();
 		program = glCreateProgram();
 		createProgram(vertexSource, fragmentSource);
@@ -47,35 +47,39 @@ public class ShaderProgram {
 		uniforms.put(uniform, location);
 	}
 
+	public int getUniformLocation(String uniform) {
+		return uniforms.get(uniform);
+	}
+
 	public void setUniform(String uniform, int value) {
-		glUniform1i(uniforms.get(uniform), value);
+		glUniform1i(getUniformLocation(uniform), value);
 	}
 
 	public void setUniform(String uniform, float value) {
-		glUniform1f(uniforms.get(uniform), value);
+		glUniform1f(getUniformLocation(uniform), value);
 	}
 
 	public void setUniform(String uniform, Vector2f value) {
-		glUniform2f(uniforms.get(uniform), value.x, value.y);
+		glUniform2f(getUniformLocation(uniform), value.x, value.y);
 	}
 
 	public void setUniform(String uniform, Vector3f value) {
-		glUniform3f(uniforms.get(uniform), value.x, value.y, value.z);
+		glUniform3f(getUniformLocation(uniform), value.x, value.y, value.z);
 	}
 
 	public void setUniform(String uniform, Vector4f value) {
-		glUniform4f(uniforms.get(uniform), value.x, value.y, value.z, value.w);
+		glUniform4f(getUniformLocation(uniform), value.x, value.y, value.z, value.w);
 	}
 
 	public void setUniform(String uniform, Matrix4f value) {
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			FloatBuffer buffer = stack.mallocFloat(16);
 			value.get(buffer);
-			glUniformMatrix4fv(uniforms.get(uniform), false, buffer);
+			glUniformMatrix4fv(getUniformLocation(uniform), false, buffer);
 		}
 	}
 
-	protected void createProgram(String vertexSource, String fragmentSource) {
+	private void createProgram(String vertexSource, String fragmentSource) {
 		int vertexShader = createShader(vertexSource, GL_VERTEX_SHADER);
 		int fragmentShader = createShader(fragmentSource, GL_FRAGMENT_SHADER);
 		glLinkProgram(program);
@@ -86,7 +90,7 @@ public class ShaderProgram {
 		deleteShader(fragmentShader);
 	}
 
-	protected int createShader(String source, int type) {
+	private int createShader(String source, int type) {
 		int shader = glCreateShader(type);
 		glShaderSource(shader, source);
 		glCompileShader(shader);
@@ -97,13 +101,13 @@ public class ShaderProgram {
 		return shader;
 	}
 
-	protected void deleteShader(int shader) {
+	private void deleteShader(int shader) {
 		glDetachShader(program, shader);
 		glDeleteShader(shader);
 	}
 
-	public static ShaderProgram loadFromFile(String vertexPath, String fragmentPath) {
-		return new ShaderProgram(ResourceUtil.getTextResourceAsString(vertexPath), ResourceUtil.getTextResourceAsString(fragmentPath));
+	public static Shader loadFromFile(String vertexPath, String fragmentPath) {
+		return new Shader(TextResource.loadFromFileAsString(vertexPath), TextResource.loadFromFileAsString(fragmentPath));
 	}
 
 }

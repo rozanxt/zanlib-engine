@@ -1,4 +1,4 @@
-package zan.engine.gfx;
+package zan.engine.gfx.texture;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,64 +14,62 @@ import java.util.Map;
 
 import org.lwjgl.system.MemoryUtil;
 
-import zan.engine.util.ConversionUtil;
+import zan.engine.util.TypeConverter;
 
-public class FontData extends TextureData {
+public class FontTexture extends Texture {
 
-	protected static class CharData {
+	public static class CharInfo {
 		public final int x;
 		public final int w;
 
-		public CharData(int x, int w) {
+		public CharInfo(int x, int w) {
 			this.x = x;
 			this.w = w;
 		}
 	}
 
-	protected final Map<Character, CharData> charData;
+	private final Map<Character, CharInfo> fontInfo;
 
-	public FontData(ByteBuffer data, int width, int height, Map<Character, CharData> charData) {
+	public FontTexture(ByteBuffer data, int width, int height, Map<Character, CharInfo> fontInfo) {
 		super(data, width, height);
-		this.charData = charData;
+		this.fontInfo = fontInfo;
 	}
 
-	public CharData getCharData(char c) {
-		return charData.get(c);
+	public CharInfo getCharInfo(char ch) {
+		return fontInfo.get(ch);
 	}
 
-	public static FontData create(Font font) {
-		return create(font, "ISO-8859-1");
+	public static FontTexture load(Font font) {
+		return load(font, "ISO-8859-1");
 	}
 
-	public static FontData create(Font font, String charset) {
+	public static FontTexture load(Font font, String charset) {
 		CharsetEncoder ce = Charset.forName(charset).newEncoder();
 		StringBuilder sa = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
-		for (char c = 0; c < Character.MAX_VALUE; c++) {
-			if (ce.canEncode(c)) {
-				sa.append(c);
-				sb.append(c).append(' ');
+		for (char ch = 0; ch < Character.MAX_VALUE; ch++) {
+			if (ce.canEncode(ch)) {
+				sa.append(ch);
+				sb.append(ch).append(' ');
 			}
 		}
 		String metricsChars = sa.toString();
 		String textureChars = sb.toString();
 
-		Map<Character, CharData> charData = new HashMap<>();
+		Map<Character, CharInfo> fontInfo = new HashMap<>();
 		int width = 0;
 		int height = 0;
+		int padding = 0;
+		if (font.isItalic()) padding = 1;
 
 		BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = bi.createGraphics();
 		g2d.setFont(font);
 		FontMetrics fm = g2d.getFontMetrics();
-		int padding = 0;
-		if (font.isItalic()) {
-			padding = 1;
-		}
-		for (char c : metricsChars.toCharArray()) {
-			CharData cd = new CharData(width, fm.charWidth(c) + padding);
-			charData.put(c, cd);
-			width += fm.charWidth(c) + fm.charWidth(' ');
+		for (char ch : metricsChars.toCharArray()) {
+			CharInfo ci = new CharInfo(width, fm.charWidth(ch) + padding);
+			fontInfo.put(ch, ci);
+			width += fm.charWidth(ch) + fm.charWidth(' ');
 			height = Math.max(height, fm.getHeight());
 		}
 		g2d.dispose();
@@ -85,8 +83,8 @@ public class FontData extends TextureData {
 		g2d.drawString(textureChars, 0, fm.getAscent());
 		g2d.dispose();
 
-		ByteBuffer buffer = ConversionUtil.BufferedImageToByteBuffer(bi);
-		FontData result = new FontData(buffer, bi.getWidth(), bi.getHeight(), charData);
+		ByteBuffer buffer = TypeConverter.BufferedImageToByteBuffer(bi);
+		FontTexture result = new FontTexture(buffer, bi.getWidth(), bi.getHeight(), fontInfo);
 		MemoryUtil.memFree(buffer);
 		return result;
 	}

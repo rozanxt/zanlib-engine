@@ -2,12 +2,12 @@ package zan.engine.sfx;
 
 import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.stb.STBVorbis.*;
+import static org.lwjgl.system.libc.LibCStdlib.*;
 
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
 public class SoundData {
 
@@ -53,7 +53,7 @@ public class SoundData {
 				format = AL_FORMAT_STEREO16;
 			}
 			sound = new SoundData(data, format, sampling);
-			MemoryUtil.memFree(data);
+			free(data);
 		}
 		return sound;
 	}

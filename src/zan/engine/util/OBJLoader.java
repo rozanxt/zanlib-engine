@@ -7,7 +7,7 @@ import java.util.List;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import zan.engine.gfx.MeshData;
+import zan.engine.gfx.mesh.Mesh3D;
 
 public final class OBJLoader {
 
@@ -50,15 +50,15 @@ public final class OBJLoader {
 
 	}
 
-	public static MeshData loadFromFile(String path) {
-		return parseOBJ(ResourceUtil.getTextResourceAsStringList(path));
+	public static Mesh3D loadFromFile(String path) {
+		return parseOBJ(TextResource.loadFromFileAsStringList(path));
 	}
 
-	public static MeshData parseOBJ(String data) {
+	public static Mesh3D parseOBJ(String data) {
 		return parseOBJ(Arrays.asList(data.split("\n")));
 	}
 
-	public static MeshData parseOBJ(List<String> data) {
+	public static Mesh3D parseOBJ(List<String> data) {
 		List<Vector3f> positions = new ArrayList<>();
 		List<Vector2f> texcoords = new ArrayList<>();
 		List<Vector3f> normals = new ArrayList<>();
@@ -94,7 +94,7 @@ public final class OBJLoader {
 		return createMesh(positions, texcoords, normals, indices, faces);
 	}
 
-	private static MeshData createMesh(List<Vector3f> positions, List<Vector2f> texcoords, List<Vector3f> normals, List<Integer> indices, List<Face> faces) {
+	private static Mesh3D createMesh(List<Vector3f> positions, List<Vector2f> texcoords, List<Vector3f> normals, List<Integer> indices, List<Face> faces) {
 		float[] posArr = new float[3 * positions.size()];
 		float[] texArr = new float[2 * positions.size()];
 		float[] nrmArr = new float[3 * positions.size()];
@@ -128,7 +128,7 @@ public final class OBJLoader {
 
 		indArr = indices.stream().mapToInt(ind -> ind).toArray();
 
-		return new MeshData(posArr, texArr, nrmArr, indArr);
+		return new Mesh3D(posArr, texArr, nrmArr, indArr);
 	}
 
 }

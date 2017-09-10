@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ResourceUtil {
+public final class TextResource {
 
-	private ResourceUtil() {
+	private TextResource() {
 
 	}
 
-	public static String getTextResourceAsString(String path) {
+	public static String loadFromFileAsString(String path) {
 		StringBuilder text = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 			String line;
@@ -25,7 +25,7 @@ public final class ResourceUtil {
 		return text.toString();
 	}
 
-	public static List<String> getTextResourceAsStringList(String path) {
+	public static List<String> loadFromFileAsStringList(String path) {
 		List<String> text = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 			String line;

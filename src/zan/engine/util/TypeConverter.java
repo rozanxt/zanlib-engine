@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.lwjgl.system.MemoryUtil;
 
-public final class ConversionUtil {
+public final class TypeConverter {
 
-	private ConversionUtil() {
+	private TypeConverter() {
 
 	}
 
