@@ -13,7 +13,6 @@ import zan.engine.core.Input;
 import zan.engine.core.Module;
 import zan.engine.gfx.Shader;
 import zan.engine.gfx.mesh.Mesh;
-import zan.engine.gfx.text.Text3D;
 import zan.engine.gfx.text.TextItem;
 import zan.engine.gfx.texture.FontTexture;
 import zan.engine.gfx.texture.Texture;
@@ -26,8 +25,8 @@ public class TestModule implements Module {
 
 	private Engine engine;
 
-	private Shader shader3d;
-	private Shader shader2d;
+	private Shader shader;
+	private Shader noshader;
 
 	private Texture texture;
 	private Mesh mesh;
@@ -53,17 +52,19 @@ public class TestModule implements Module {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 
-		shader3d = Shader.loadFromFile("res/shd/shader3d.vs", "res/shd/shader3d.fs");
-		shader3d.addUniform("projectionMatrix");
-		shader3d.addUniform("modelViewMatrix");
-		shader3d.addUniform("textureUnit");
-		shader3d.addUniform("tintColor");
+		shader = Shader.loadFromFile("res/shd/shader.vs", "res/shd/shader.fs");
+		shader.addUniform("projectionMatrix");
+		shader.addUniform("modelViewMatrix");
+		shader.addUniform("useTexture");
+		shader.addUniform("textureUnit");
+		shader.addUniform("tintColor");
 
-		shader2d = Shader.loadFromFile("res/shd/shader2d.vs", "res/shd/shader2d.fs");
-		shader2d.addUniform("projectionMatrix");
-		shader2d.addUniform("modelViewMatrix");
-		shader2d.addUniform("textureUnit");
-		shader3d.addUniform("tintColor");
+		noshader = Shader.loadFromFile("res/shd/noshader.vs", "res/shd/noshader.fs");
+		noshader.addUniform("projectionMatrix");
+		noshader.addUniform("modelViewMatrix");
+		noshader.addUniform("useTexture");
+		noshader.addUniform("textureUnit");
+		noshader.addUniform("tintColor");
 
 		texture = Texture.loadFromFile("res/img/grassblock.png");
 		mesh = OBJLoader.loadFromFile("res/obj/block.obj");
@@ -73,7 +74,7 @@ public class TestModule implements Module {
 		font[1] = FontTexture.load(new Font(Font.SANS_SERIF, Font.BOLD, 20));
 		font[2] = FontTexture.load(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
 		font[3] = FontTexture.load(new Font(Font.SANS_SERIF, Font.BOLD + Font.ITALIC, 20));
-		text = new Text3D("ZanEngine", font[0], 0);
+		text = new TextItem("ZanEngine", font[0]);
 
 		Sound.init();
 		music = SoundData.loadFromFile("res/snd/humoresky.ogg");
@@ -82,8 +83,8 @@ public class TestModule implements Module {
 
 	@Override
 	public void exit() {
-		shader3d.delete();
-		shader2d.delete();
+		shader.delete();
+		noshader.delete();
 		texture.delete();
 		mesh.delete();
 		for (int i = 0; i < font.length; i++) {
@@ -155,29 +156,31 @@ public class TestModule implements Module {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, width, height);
 
-		shader3d.bind();
-		shader3d.setUniform("projectionMatrix", new Matrix4f().perspective((float) Math.toRadians(60.0f), (float) width / height, 0.01f, 1000.0f));
-		shader3d.setUniform("modelViewMatrix", new Matrix4f()
+		shader.bind();
+		shader.setUniform("projectionMatrix", new Matrix4f().perspective((float) Math.toRadians(60.0f), (float) width / height, 0.01f, 1000.0f));
+		shader.setUniform("modelViewMatrix", new Matrix4f()
 			.translate(0.0f, 0.0f, translationZ)
 			.rotate((float) Math.toRadians(rotationX), 1.0f, 0.0f, 0.0f)
 			.rotate((float) Math.toRadians(rotationY), 0.0f, 1.0f, 0.0f)
 			.scale(1.0f));
-		shader3d.setUniform("textureUnit", 0);
-		shader3d.setUniform("tintColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+		shader.setUniform("useTexture", 1);
+		shader.setUniform("textureUnit", 0);
+		shader.setUniform("tintColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 		texture.bind();
 		mesh.bind();
 		mesh.draw();
 		mesh.unbind();
 		texture.unbind();
-		shader3d.unbind();
+		shader.unbind();
 
-		shader2d.bind();
-		shader2d.setUniform("projectionMatrix", new Matrix4f().ortho2D(-width / 2.0f, width / 2.0f, 0.0f, height));
-		shader2d.setUniform("modelViewMatrix", new Matrix4f().translate(-50.0f, height - 30.0f, 0.0f));
-		shader2d.setUniform("textureUnit", 0);
-		shader3d.setUniform("tintColor", new Vector4f(0.0f, 0.5f, 0.8f, 0.5f));
+		noshader.bind();
+		noshader.setUniform("projectionMatrix", new Matrix4f().ortho2D(-width / 2.0f, width / 2.0f, 0.0f, height));
+		noshader.setUniform("modelViewMatrix", new Matrix4f().translate(-50.0f, height - 30.0f, 0.0f));
+		noshader.setUniform("useTexture", 1);
+		noshader.setUniform("textureUnit", 0);
+		noshader.setUniform("tintColor", new Vector4f(0.0f, 0.5f, 0.8f, 0.5f));
 		text.render();
-		shader2d.unbind();
+		noshader.unbind();
 	}
 
 }
