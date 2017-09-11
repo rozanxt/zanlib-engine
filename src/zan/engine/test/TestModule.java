@@ -12,12 +12,14 @@ import zan.engine.core.Engine;
 import zan.engine.core.Input;
 import zan.engine.core.Module;
 import zan.engine.gfx.Shader;
+import zan.engine.gfx.item.SpriteItem;
+import zan.engine.gfx.item.TextItem;
 import zan.engine.gfx.mesh.Mesh;
-import zan.engine.gfx.text.TextItem;
 import zan.engine.gfx.texture.FontTexture;
+import zan.engine.gfx.texture.SpriteTexture;
 import zan.engine.gfx.texture.Texture;
 import zan.engine.sfx.SoundData;
-import zan.engine.sfx.Sound;
+import zan.engine.sfx.SoundSystem;
 import zan.engine.sfx.SoundSource;
 import zan.engine.util.OBJLoader;
 
@@ -34,12 +36,18 @@ public class TestModule implements Module {
 	private FontTexture[] font;
 	private TextItem text;
 
+	private SpriteTexture sheet;
+	private SpriteItem sprite;
+
 	private SoundData music;
 	private SoundSource source;
 
 	private float rotationX = 30.0f;
 	private float rotationY = 60.0f;
 	private float translationZ = -5.0f;
+
+	private int ticks = 0;
+	private int frame = 0;
 
 	public TestModule(Engine engine) {
 		this.engine = engine;
@@ -76,7 +84,11 @@ public class TestModule implements Module {
 		font[3] = FontTexture.load(new Font(Font.SANS_SERIF, Font.BOLD + Font.ITALIC, 20));
 		text = new TextItem("ZanEngine", font[0]);
 
-		Sound.init();
+		sheet = SpriteTexture.loadFromFile("res/img/animation.png", 1, 12);
+		sprite = new SpriteItem(sheet);
+		sprite.setFrame(frame);
+
+		SoundSystem.init();
 		music = SoundData.loadFromFile("res/snd/humoresky.ogg");
 		source = new SoundSource(music);
 	}
@@ -91,9 +103,11 @@ public class TestModule implements Module {
 			font[i].delete();
 		}
 		text.delete();
+		sheet.delete();
+		sprite.delete();
 		source.delete();
 		music.delete();
-		Sound.exit();
+		SoundSystem.exit();
 	}
 
 	@Override
@@ -145,6 +159,16 @@ public class TestModule implements Module {
 		}
 
 		translationZ += 0.5f * input.getMouseScrollY();
+
+		ticks++;
+		if (ticks >= 3) {
+			frame++;
+			ticks = 0;
+		}
+		if (frame >= 12) {
+			frame = 0;
+		}
+		sprite.setFrame(frame);
 	}
 
 	@Override
@@ -180,6 +204,9 @@ public class TestModule implements Module {
 		noshader.setUniform("textureUnit", 0);
 		noshader.setUniform("tintColor", new Vector4f(0.0f, 0.5f, 0.8f, 0.5f));
 		text.render();
+		noshader.setUniform("modelViewMatrix", new Matrix4f().translate(width * 1.0f / 4.0f, height / 2.0f - 64.0f, 0.0f));
+		noshader.setUniform("tintColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+		sprite.render();
 		noshader.unbind();
 	}
 

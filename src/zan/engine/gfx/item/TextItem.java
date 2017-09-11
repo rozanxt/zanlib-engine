@@ -1,9 +1,9 @@
-package zan.engine.gfx.text;
+package zan.engine.gfx.item;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import zan.engine.gfx.mesh.Mesh3D;
+import zan.engine.gfx.mesh.Mesh2D;
 import zan.engine.gfx.texture.FontTexture;
 import zan.engine.util.TypeConverter;
 
@@ -27,25 +27,21 @@ public class TextItem {
 
 				pos.add(offsetX);
 				pos.add((float) -line * font.getHeight());
-				pos.add(0.0f);
 				tex.add((float) data.x / (float) font.getWidth());
 				tex.add(1.0f);
 
 				pos.add(offsetX + data.w);
 				pos.add((float) -line * font.getHeight());
-				pos.add(0.0f);
 				tex.add((float) (data.x + data.w) / (float) font.getWidth());
 				tex.add(1.0f);
 
 				pos.add(offsetX + data.w);
 				pos.add((float) (1 - line) * font.getHeight());
-				pos.add(0.0f);
 				tex.add((float) (data.x + data.w) / (float) font.getWidth());
 				tex.add(0.0f);
 
 				pos.add(offsetX);
 				pos.add((float) (1 - line) * font.getHeight());
-				pos.add(0.0f);
 				tex.add((float) data.x / (float) font.getWidth());
 				tex.add(0.0f);
 
@@ -68,7 +64,7 @@ public class TextItem {
 
 			this.pos = TypeConverter.FloatListToArray(pos);
 			this.tex = TypeConverter.FloatListToArray(tex);
-			this.ind = ind.stream().mapToInt(i -> i).toArray();
+			this.ind = TypeConverter.IntegerListToArray(ind);
 		}
 	}
 
@@ -77,18 +73,22 @@ public class TextItem {
 
 	private int width;
 
-	private Mesh3D mesh;
+	private final Mesh2D mesh;
 
 	public TextItem(String text, FontTexture font, int width) {
 		this.text = text;
 		this.font = font;
 		this.width = width;
 		TextBuild build = new TextBuild(text, font, width);
-		mesh = new Mesh3D(build.pos, build.tex, new float[] { 0 }, build.ind);
+		mesh = new Mesh2D(build.pos, build.tex, build.ind);
 	}
 
 	public TextItem(String text, FontTexture font) {
 		this(text, font, 0);
+	}
+
+	public TextItem(FontTexture font, int width) {
+		this("", font, width);
 	}
 
 	public TextItem(FontTexture font) {
@@ -102,9 +102,9 @@ public class TextItem {
 	public void update() {
 		TextBuild build = new TextBuild(text, font, width);
 		mesh.bind();
-		mesh.setVertexData(Mesh3D.POS, build.pos);
-		mesh.setVertexData(Mesh3D.TEX, build.tex);
-		mesh.setIndexData(Mesh3D.IND, build.ind);
+		mesh.setVertexData(Mesh2D.POS, build.pos);
+		mesh.setVertexData(Mesh2D.TEX, build.tex);
+		mesh.setIndexData(Mesh2D.IND, build.ind);
 		mesh.setNumElements(build.ind.length);
 		mesh.unbind();
 	}

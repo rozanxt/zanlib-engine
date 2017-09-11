@@ -216,4 +216,12 @@ public class Input {
 		return mouseLeft;
 	}
 
+	public boolean hasCharEvent() {
+		return !charEvents.isEmpty();
+	}
+
+	public char getCharEvent() {
+		return charEvents.isEmpty() ? 0 : charEvents.remove(0);
+	}
+
 }

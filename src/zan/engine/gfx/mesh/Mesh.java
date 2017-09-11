@@ -12,6 +12,7 @@ import org.lwjgl.system.MemoryUtil;
 
 public class Mesh {
 
+	private static final int BYTES_PER_INT = 4;
 	private static final int BYTES_PER_FLOAT = 4;
 
 	private final int vao;
@@ -44,7 +45,7 @@ public class Mesh {
 	}
 
 	public void draw(int mode, int count, int offset) {
-		glDrawElements(mode, count, GL_UNSIGNED_INT, offset);
+		glDrawElements(mode, count, GL_UNSIGNED_INT, offset * BYTES_PER_INT);
 	}
 
 	public void draw() {

@@ -1,5 +1,7 @@
 package zan.engine.gfx.texture;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -30,9 +32,13 @@ public class FontTexture extends Texture {
 
 	private final Map<Character, CharInfo> fontInfo;
 
-	public FontTexture(ByteBuffer data, int width, int height, Map<Character, CharInfo> fontInfo) {
-		super(data, width, height);
+	public FontTexture(ByteBuffer data, int width, int height, int minfilter, int magfilter, Map<Character, CharInfo> fontInfo) {
+		super(data, width, height, minfilter, magfilter);
 		this.fontInfo = fontInfo;
+	}
+
+	public FontTexture(ByteBuffer data, int width, int height, Map<Character, CharInfo> fontInfo) {
+		this(data, width, height, GL_NEAREST, GL_NEAREST, fontInfo);
 	}
 
 	public CharInfo getCharInfo(char ch) {

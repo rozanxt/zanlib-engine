@@ -8,12 +8,12 @@ import org.joml.Vector3f;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 
-public final class Sound {
+public final class SoundSystem {
 
 	private static long device;
 	private static long context;
 
-	private Sound() {
+	private SoundSystem() {
 
 	}
 

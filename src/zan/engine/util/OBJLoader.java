@@ -98,7 +98,6 @@ public final class OBJLoader {
 		float[] posArr = new float[3 * positions.size()];
 		float[] texArr = new float[2 * positions.size()];
 		float[] nrmArr = new float[3 * positions.size()];
-		int[] indArr = new int[indices.size()];
 
 		int i = 0;
 		for (Vector3f pos : positions) {
@@ -126,9 +125,7 @@ public final class OBJLoader {
 			}
 		}
 
-		indArr = indices.stream().mapToInt(ind -> ind).toArray();
-
-		return new Mesh3D(posArr, texArr, nrmArr, indArr);
+		return new Mesh3D(posArr, texArr, nrmArr, TypeConverter.IntegerListToArray(indices));
 	}
 
 }
