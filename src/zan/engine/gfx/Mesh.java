@@ -1,4 +1,4 @@
-package zan.engine.gfx.mesh;
+package zan.engine.gfx;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;

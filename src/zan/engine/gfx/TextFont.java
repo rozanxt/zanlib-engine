@@ -1,6 +1,4 @@
-package zan.engine.gfx.texture;
-
-import static org.lwjgl.opengl.GL11.*;
+package zan.engine.gfx;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -18,7 +16,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import zan.engine.util.TypeConverter;
 
-public class FontTexture extends Texture {
+public class TextFont {
 
 	public static class CharInfo {
 		public final int x;
@@ -32,37 +30,22 @@ public class FontTexture extends Texture {
 
 	private final Map<Character, CharInfo> fontInfo;
 
-	public FontTexture(ByteBuffer data, int width, int height, int minfilter, int magfilter, Map<Character, CharInfo> fontInfo) {
-		super(data, width, height, minfilter, magfilter);
-		this.fontInfo = fontInfo;
-	}
+	private final Texture fontTexture;
 
-	public FontTexture(ByteBuffer data, int width, int height, Map<Character, CharInfo> fontInfo) {
-		this(data, width, height, GL_NEAREST, GL_NEAREST, fontInfo);
-	}
-
-	public CharInfo getCharInfo(char ch) {
-		return fontInfo.get(ch);
-	}
-
-	public static FontTexture load(Font font) {
-		return load(font, "ISO-8859-1");
-	}
-
-	public static FontTexture load(Font font, String charset) {
+	public TextFont(Font font, String charset) {
 		CharsetEncoder ce = Charset.forName(charset).newEncoder();
-		StringBuilder sa = new StringBuilder();
-		StringBuilder sb = new StringBuilder();
+		StringBuilder mc = new StringBuilder();
+		StringBuilder tc = new StringBuilder();
 		for (char ch = 0; ch < Character.MAX_VALUE; ch++) {
 			if (ce.canEncode(ch)) {
-				sa.append(ch);
-				sb.append(ch).append(' ');
+				mc.append(ch);
+				tc.append(ch).append(' ');
 			}
 		}
-		String metricsChars = sa.toString();
-		String textureChars = sb.toString();
+		String metricsChars = mc.toString();
+		String textureChars = tc.toString();
 
-		Map<Character, CharInfo> fontInfo = new HashMap<>();
+		fontInfo = new HashMap<>();
 		int width = 0;
 		int height = 0;
 		int padding = 0;
@@ -90,9 +73,24 @@ public class FontTexture extends Texture {
 		g2d.dispose();
 
 		ByteBuffer buffer = TypeConverter.BufferedImageToByteBuffer(bi);
-		FontTexture result = new FontTexture(buffer, bi.getWidth(), bi.getHeight(), fontInfo);
+		fontTexture = new Texture(buffer, bi.getWidth(), bi.getHeight());
 		MemoryUtil.memFree(buffer);
-		return result;
+	}
+
+	public TextFont(Font font) {
+		this(font, "ISO-8859-1");
+	}
+
+	public void delete() {
+		fontTexture.delete();
+	}
+
+	public CharInfo getCharInfo(char ch) {
+		return fontInfo.get(ch);
+	}
+
+	public Texture getTexture() {
+		return fontTexture;
 	}
 
 }

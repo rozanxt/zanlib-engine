@@ -2,16 +2,19 @@ package zan.engine.core;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.system.MemoryStack;
+
 public class Input {
 
-	private static class KeyEvent {
-		public int mods = 0;
-		public boolean pressed = false;
-		public boolean released = false;
-		public boolean repeated = false;
+	private static class Event {
+		public int mods;
+		public boolean pressed;
+		public boolean released;
+		public boolean repeated;
 
 		public void clear() {
 			mods = 0;
@@ -21,22 +24,10 @@ public class Input {
 		}
 	}
 
-	private static class MouseEvent {
-		public int mods = 0;
-		public boolean pressed = false;
-		public boolean released = false;
-
-		public void clear() {
-			mods = 0;
-			pressed = false;
-			released = false;
-		}
-	}
-
 	private final Window window;
 
-	private final KeyEvent[] keyEvents;
-	private final MouseEvent[] mouseEvents;
+	private final Event[] keyEvents;
+	private final Event[] mouseEvents;
 	private final List<Character> charEvents;
 
 	private float mouseX;
@@ -50,48 +41,28 @@ public class Input {
 
 	public Input(Window window) {
 		this.window = window;
-
-		keyEvents = new KeyEvent[GLFW_KEY_LAST];
+		keyEvents = new Event[GLFW_KEY_LAST];
 		for (int i = 0; i < GLFW_KEY_LAST; i++) {
-			keyEvents[i] = new KeyEvent();
+			keyEvents[i] = new Event();
 		}
-		mouseEvents = new MouseEvent[GLFW_MOUSE_BUTTON_LAST];
+		mouseEvents = new Event[GLFW_MOUSE_BUTTON_LAST];
 		for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++) {
-			mouseEvents[i] = new MouseEvent();
+			mouseEvents[i] = new Event();
 		}
 		charEvents = new ArrayList<Character>();
-
-		mouseX = 0.0f;
-		mouseY = 0.0f;
-		mouseDeltaX = 0.0f;
-		mouseDeltaY = 0.0f;
-		mouseScrollX = 0.0f;
-		mouseScrollY = 0.0f;
-		mouseEntered = false;
-		mouseLeft = false;
-	}
-
-	public void clear() {
-		for (int i = 0; i < GLFW_KEY_LAST; i++) {
-			keyEvents[i].clear();
-		}
-		for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++) {
-			mouseEvents[i].clear();
-		}
-		charEvents.clear();
-
-		mouseDeltaX = 0.0f;
-		mouseDeltaY = 0.0f;
-		mouseScrollX = 0.0f;
-		mouseScrollY = 0.0f;
-		mouseEntered = false;
-		mouseLeft = false;
 	}
 
 	public void init() {
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			DoubleBuffer x = stack.mallocDouble(1);
+			DoubleBuffer y = stack.mallocDouble(1);
+			glfwGetCursorPos(window.getHandle(), x, y);
+			mouseX = (float) x.get(0);
+			mouseY = (float) y.get(0);
+		}
 		glfwSetKeyCallback(window.getHandle(), (window, key, scancode, action, mods) -> {
 			if (key == GLFW_KEY_UNKNOWN) return;
-			KeyEvent keyEvent = keyEvents[key];
+			Event keyEvent = keyEvents[key];
 			keyEvent.mods = mods;
 			switch (action) {
 			case GLFW_PRESS:
@@ -107,7 +78,7 @@ public class Input {
 		});
 		glfwSetMouseButtonCallback(window.getHandle(), (window, button, action, mods) -> {
 			if (button == GLFW_KEY_UNKNOWN) return;
-			MouseEvent mouseEvent = mouseEvents[button];
+			Event mouseEvent = mouseEvents[button];
 			mouseEvent.mods = mods;
 			switch (action) {
 			case GLFW_PRESS:
@@ -140,12 +111,28 @@ public class Input {
 		});
 	}
 
+	public void clear() {
+		for (int i = 0; i < GLFW_KEY_LAST; i++) {
+			keyEvents[i].clear();
+		}
+		for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++) {
+			mouseEvents[i].clear();
+		}
+		charEvents.clear();
+		mouseDeltaX = 0.0f;
+		mouseDeltaY = 0.0f;
+		mouseScrollX = 0.0f;
+		mouseScrollY = 0.0f;
+		mouseEntered = false;
+		mouseLeft = false;
+	}
+
 	public void exit() {
 
 	}
 
-	public void setMouseMode(int mode) {
-		glfwSetInputMode(window.getHandle(), GLFW_CURSOR, mode);
+	public void setInputMode(int mode, int value) {
+		glfwSetInputMode(window.getHandle(), mode, value);
 	}
 
 	public float getMouseX() {

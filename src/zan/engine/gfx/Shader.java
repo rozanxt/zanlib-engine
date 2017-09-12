@@ -47,35 +47,35 @@ public class Shader {
 		uniforms.put(uniform, location);
 	}
 
-	public int getUniformLocation(String uniform) {
+	public int getUniform(String uniform) {
 		return uniforms.get(uniform);
 	}
 
 	public void setUniform(String uniform, int value) {
-		glUniform1i(getUniformLocation(uniform), value);
+		glUniform1i(getUniform(uniform), value);
 	}
 
 	public void setUniform(String uniform, float value) {
-		glUniform1f(getUniformLocation(uniform), value);
+		glUniform1f(getUniform(uniform), value);
 	}
 
 	public void setUniform(String uniform, Vector2f value) {
-		glUniform2f(getUniformLocation(uniform), value.x, value.y);
+		glUniform2f(getUniform(uniform), value.x, value.y);
 	}
 
 	public void setUniform(String uniform, Vector3f value) {
-		glUniform3f(getUniformLocation(uniform), value.x, value.y, value.z);
+		glUniform3f(getUniform(uniform), value.x, value.y, value.z);
 	}
 
 	public void setUniform(String uniform, Vector4f value) {
-		glUniform4f(getUniformLocation(uniform), value.x, value.y, value.z, value.w);
+		glUniform4f(getUniform(uniform), value.x, value.y, value.z, value.w);
 	}
 
 	public void setUniform(String uniform, Matrix4f value) {
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			FloatBuffer buffer = stack.mallocFloat(16);
 			value.get(buffer);
-			glUniformMatrix4fv(getUniformLocation(uniform), false, buffer);
+			glUniformMatrix4fv(getUniform(uniform), false, buffer);
 		}
 	}
 

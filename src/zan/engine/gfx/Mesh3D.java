@@ -1,4 +1,4 @@
-package zan.engine.gfx.mesh;
+package zan.engine.gfx;
 
 public class Mesh3D extends Mesh {
 

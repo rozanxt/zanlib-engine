@@ -11,17 +11,16 @@ import org.joml.Vector4f;
 import zan.engine.core.Engine;
 import zan.engine.core.Input;
 import zan.engine.core.Module;
+import zan.engine.gfx.Mesh;
+import zan.engine.gfx.OBJLoader;
 import zan.engine.gfx.Shader;
-import zan.engine.gfx.item.SpriteItem;
-import zan.engine.gfx.item.TextItem;
-import zan.engine.gfx.mesh.Mesh;
-import zan.engine.gfx.texture.FontTexture;
-import zan.engine.gfx.texture.SpriteTexture;
-import zan.engine.gfx.texture.Texture;
+import zan.engine.gfx.SpriteItem;
+import zan.engine.gfx.TextFont;
+import zan.engine.gfx.TextItem;
+import zan.engine.gfx.Texture;
 import zan.engine.sfx.SoundData;
 import zan.engine.sfx.SoundSystem;
 import zan.engine.sfx.SoundSource;
-import zan.engine.util.OBJLoader;
 
 public class TestModule implements Module {
 
@@ -33,10 +32,10 @@ public class TestModule implements Module {
 	private Texture texture;
 	private Mesh mesh;
 
-	private FontTexture[] font;
+	private TextFont[] font;
 	private TextItem text;
 
-	private SpriteTexture sheet;
+	private Texture sheet;
 	private SpriteItem sprite;
 
 	private SoundData music;
@@ -77,16 +76,15 @@ public class TestModule implements Module {
 		texture = Texture.loadFromFile("res/img/grassblock.png");
 		mesh = OBJLoader.loadFromFile("res/obj/block.obj");
 
-		font = new FontTexture[4];
-		font[0] = FontTexture.load(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-		font[1] = FontTexture.load(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-		font[2] = FontTexture.load(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
-		font[3] = FontTexture.load(new Font(Font.SANS_SERIF, Font.BOLD + Font.ITALIC, 20));
+		font = new TextFont[4];
+		font[0] = new TextFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+		font[1] = new TextFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+		font[2] = new TextFont(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
+		font[3] = new TextFont(new Font(Font.SANS_SERIF, Font.BOLD + Font.ITALIC, 20));
 		text = new TextItem("ZanEngine", font[0]);
 
-		sheet = SpriteTexture.loadFromFile("res/img/animation.png", 1, 12);
-		sprite = new SpriteItem(sheet);
-		sprite.setFrame(frame);
+		sheet = Texture.loadFromFile("res/img/animation.png");
+		sprite = new SpriteItem(sheet, 12, 1);
 
 		SoundSystem.init();
 		music = SoundData.loadFromFile("res/snd/humoresky.ogg");
@@ -122,14 +120,10 @@ public class TestModule implements Module {
 		}
 
 		if (input.isKeyReleased(GLFW_KEY_ENTER)) {
-			if (source.isInitial()) {
-				source.play();
-			} else if (source.isPlaying()) {
+			if (source.isPlaying()) {
 				source.pause();
-			} else if (source.isPaused()) {
-				source.resume();
-			} else if (source.isStopped()) {
-				source.rewind();
+			} else {
+				source.play();
 			}
 		}
 		if (input.isKeyReleased(GLFW_KEY_BACKSPACE)) {
@@ -168,7 +162,6 @@ public class TestModule implements Module {
 		if (frame >= 12) {
 			frame = 0;
 		}
-		sprite.setFrame(frame);
 	}
 
 	@Override
@@ -206,7 +199,7 @@ public class TestModule implements Module {
 		text.render();
 		noshader.setUniform("modelViewMatrix", new Matrix4f().translate(width * 1.0f / 4.0f, height / 2.0f - 64.0f, 0.0f));
 		noshader.setUniform("tintColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-		sprite.render();
+		sprite.render(frame);
 		noshader.unbind();
 	}
 

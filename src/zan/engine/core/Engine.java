@@ -8,15 +8,27 @@ public class Engine implements Runnable {
 
 	private static final long NANOS_PER_SECOND = 1_000_000_000L;
 
-	private Window window = null;
-	private Input input = null;
-	private Module module = null;
+	private Window window;
+	private Input input;
+	private Module module;
 
-	private int targetFPS = 60;
-	private int targetUPS = 50;
+	private int targetFPS;
+	private int targetUPS;
 
-	private int currentFPS = 0;
-	private int currentUPS = 0;
+	private int currentFPS;
+	private int currentUPS;
+
+	public Engine(Window window, Input input, Module module, int targetFPS, int targetUPS) {
+		this.window = window;
+		this.input = input;
+		this.module = module;
+		this.targetFPS = targetFPS;
+		this.targetUPS = targetUPS;
+	}
+
+	public Engine(int targetFPS, int targetUPS) {
+		this(null, null, null, targetFPS, targetUPS);
+	}
 
 	public void start() {
 		Thread thread = new Thread(this, "engine");

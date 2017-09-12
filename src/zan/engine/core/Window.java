@@ -23,12 +23,11 @@ public class Window {
 		public int x = GLFW_DONT_CARE;
 		public int y = GLFW_DONT_CARE;
 
-		public int width = 640;
-		public int height = 480;
+		public int width;
+		public int height;
 
 		public boolean fullscreen = false;
 		public boolean vsync = true;
-
 		public boolean resizable = true;
 		public boolean decorated = true;
 		public boolean focused = true;
@@ -37,14 +36,19 @@ public class Window {
 		public boolean maximized = false;
 		public boolean minimized = false;
 		public boolean visible = true;
+
+		public Attributes(int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
 	}
 
 	private final Attributes attr;
 
-	private int width = 0;
-	private int height = 0;
+	private int width;
+	private int height;
 
-	private long handle = 0L;
+	private long handle;
 
 	public Window(Attributes attr) {
 		this.attr = attr;
@@ -70,14 +74,17 @@ public class Window {
 	}
 
 	private void initWindow() {
-		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		long monitor = glfwGetPrimaryMonitor();
+		GLFWVidMode vidmode = glfwGetVideoMode(monitor);
 
 		if (attr.fullscreen) {
 			width = vidmode.width();
 			height = vidmode.height();
-			handle = glfwCreateWindow(width, height, attr.title, glfwGetPrimaryMonitor(), NULL);
+			handle = glfwCreateWindow(width, height, attr.title, monitor, NULL);
 		} else {
-			handle = glfwCreateWindow(attr.width, attr.height, attr.title, NULL, NULL);
+			width = attr.width;
+			height = attr.height;
+			handle = glfwCreateWindow(width, height, attr.title, NULL, NULL);
 		}
 		if (handle == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window!");

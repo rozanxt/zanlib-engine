@@ -22,17 +22,13 @@ public class SoundSource {
 	}
 
 	public void play() {
+		alSourcef(id, AL_SEC_OFFSET, offset);
 		alSourcePlay(id);
 	}
 
 	public void pause() {
 		offset = alGetSourcef(id, AL_SEC_OFFSET);
 		alSourceStop(id);
-	}
-
-	public void resume() {
-		alSourcef(id, AL_SEC_OFFSET, offset);
-		alSourcePlay(id);
 	}
 
 	public void stop() {
@@ -46,6 +42,10 @@ public class SoundSource {
 
 	public void setProperty(int property, boolean value) {
 		alSourcei(id, property, value ? AL_TRUE : AL_FALSE);
+	}
+
+	public void setProperty(int property, int value) {
+		alSourcei(id, property, value);
 	}
 
 	public void setProperty(int property, float value) {

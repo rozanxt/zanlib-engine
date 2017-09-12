@@ -1,10 +1,8 @@
-package zan.engine.gfx.item;
+package zan.engine.gfx;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import zan.engine.gfx.mesh.Mesh2D;
-import zan.engine.gfx.texture.FontTexture;
 import zan.engine.util.TypeConverter;
 
 public class TextItem {
@@ -14,7 +12,7 @@ public class TextItem {
 		public final float[] tex;
 		public final int[] ind;
 
-		public TextBuild(String text, FontTexture font, int width) {
+		public TextBuild(String text, TextFont font, int width) {
 			List<Float> pos = new ArrayList<>();
 			List<Float> tex = new ArrayList<>();
 			List<Integer> ind = new ArrayList<>();
@@ -22,27 +20,29 @@ public class TextItem {
 
 			float offsetX = 0.0f;
 			int line = 0;
+			int fontWidth = font.getTexture().getWidth();
+			int fontHeight = font.getTexture().getHeight();
 			for (int i = 0; i < chars.length; i++) {
-				FontTexture.CharInfo data = font.getCharInfo(chars[i]);
+				TextFont.CharInfo data = font.getCharInfo(chars[i]);
 
 				pos.add(offsetX);
-				pos.add((float) -line * font.getHeight());
-				tex.add((float) data.x / (float) font.getWidth());
+				pos.add((float) -line * fontHeight);
+				tex.add((float) data.x / (float) fontWidth);
 				tex.add(1.0f);
 
 				pos.add(offsetX + data.w);
-				pos.add((float) -line * font.getHeight());
-				tex.add((float) (data.x + data.w) / (float) font.getWidth());
+				pos.add((float) -line * fontHeight);
+				tex.add((float) (data.x + data.w) / (float) fontWidth);
 				tex.add(1.0f);
 
 				pos.add(offsetX + data.w);
-				pos.add((float) (1 - line) * font.getHeight());
-				tex.add((float) (data.x + data.w) / (float) font.getWidth());
+				pos.add((float) (1 - line) * fontHeight);
+				tex.add((float) (data.x + data.w) / (float) fontWidth);
 				tex.add(0.0f);
 
 				pos.add(offsetX);
-				pos.add((float) (1 - line) * font.getHeight());
-				tex.add((float) data.x / (float) font.getWidth());
+				pos.add((float) (1 - line) * fontHeight);
+				tex.add((float) data.x / (float) fontWidth);
 				tex.add(0.0f);
 
 				ind.add(4 * i);
@@ -69,13 +69,13 @@ public class TextItem {
 	}
 
 	private String text;
-	private FontTexture font;
+	private TextFont font;
 
 	private int width;
 
 	private final Mesh2D mesh;
 
-	public TextItem(String text, FontTexture font, int width) {
+	public TextItem(String text, TextFont font, int width) {
 		this.text = text;
 		this.font = font;
 		this.width = width;
@@ -83,15 +83,15 @@ public class TextItem {
 		mesh = new Mesh2D(build.pos, build.tex, build.ind);
 	}
 
-	public TextItem(String text, FontTexture font) {
+	public TextItem(String text, TextFont font) {
 		this(text, font, 0);
 	}
 
-	public TextItem(FontTexture font, int width) {
+	public TextItem(TextFont font, int width) {
 		this("", font, width);
 	}
 
-	public TextItem(FontTexture font) {
+	public TextItem(TextFont font) {
 		this("", font);
 	}
 
@@ -110,18 +110,18 @@ public class TextItem {
 	}
 
 	public void render() {
-		font.bind();
+		font.getTexture().bind();
 		mesh.bind();
 		mesh.draw();
 		mesh.unbind();
-		font.unbind();
+		font.getTexture().bind();
 	}
 
 	public void setText(String text) {
 		this.text = text;
 	}
 
-	public void setFont(FontTexture font) {
+	public void setFont(TextFont font) {
 		this.font = font;
 	}
 

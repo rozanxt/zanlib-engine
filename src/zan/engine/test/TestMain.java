@@ -8,8 +8,8 @@ import zan.engine.core.Window;
 public class TestMain {
 
 	public static void main(String[] args) {
-		Engine engine = new Engine();
-		Window.Attributes attr = new Window.Attributes();
+		Engine engine = new Engine(60, 50);
+		Window.Attributes attr = new Window.Attributes(640, 480);
 		attr.title = "Test";
 		attr.icon = "res/ico/icon.png";
 		Window window = new Window(attr);

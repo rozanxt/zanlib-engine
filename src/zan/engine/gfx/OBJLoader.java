@@ -1,4 +1,4 @@
-package zan.engine.util;
+package zan.engine.gfx;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,7 +7,8 @@ import java.util.List;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import zan.engine.gfx.mesh.Mesh3D;
+import zan.engine.util.TextResource;
+import zan.engine.util.TypeConverter;
 
 public final class OBJLoader {
 
