@@ -22,13 +22,17 @@ public class SoundSource {
 	}
 
 	public void play() {
-		alSourcef(id, AL_SEC_OFFSET, offset);
 		alSourcePlay(id);
 	}
 
 	public void pause() {
 		offset = alGetSourcef(id, AL_SEC_OFFSET);
 		alSourceStop(id);
+	}
+
+	public void resume() {
+		alSourcef(id, AL_SEC_OFFSET, offset);
+		alSourcePlay(id);
 	}
 
 	public void stop() {

@@ -61,11 +61,9 @@ public class TextItem {
 				if (offset > width) {
 					width = offset;
 				}
-				if (maxWidth > 0) {
-					if (chars[i] == '\n' || (chars[i] == ' ' && offset > maxWidth)) {
-						offset = 0.0f;
-						line++;
-					}
+				if (chars[i] == '\n' || (maxWidth > 0 && offset > maxWidth && chars[i] == ' ')) {
+					offset = 0.0f;
+					line++;
 				}
 			}
 

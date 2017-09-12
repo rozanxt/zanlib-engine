@@ -47,6 +47,8 @@ public class Demo implements Module {
 
 	private TextFont font;
 	private TextItem text;
+	private TextItem help;
+	private boolean showHelp;
 
 	private SoundData sound;
 	private SoundSource source;
@@ -71,8 +73,8 @@ public class Demo implements Module {
 		noshader.addUniform("enableTexture");
 		noshader.addUniform("textureUnit");
 
-		texture = Texture.loadFromFile("res/img/grassblock.png");
-		cube = OBJLoader.loadFromFile("res/obj/block.obj");
+		texture = Texture.loadFromFile("res/tmp/spaceship.png");
+		cube = OBJLoader.loadFromFile("res/tmp/spaceship.obj");
 		cubeShader = shader;
 		cubeUniformColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 		cubeEnableTexture = true;
@@ -87,7 +89,9 @@ public class Demo implements Module {
 		spriteFlip = false;
 
 		font = new TextFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-		text = new TextItem("ZanEngine", font, 550.0f);
+		text = new TextItem("ZanEngine", font);
+		help = new TextItem("F1: Help", font);
+		showHelp = false;
 
 		SoundSystem.init();
 		sound = SoundData.loadFromFile("res/snd/humoresky.ogg");
@@ -104,6 +108,7 @@ public class Demo implements Module {
 		sprite.delete();
 		font.delete();
 		text.delete();
+		help.delete();
 		sound.delete();
 		source.delete();
 		SoundSystem.exit();
@@ -115,6 +120,22 @@ public class Demo implements Module {
 
 		if (input.isKeyReleased(GLFW.GLFW_KEY_ESCAPE)) {
 			engine.getWindow().close();
+		} else if (input.isKeyReleased(GLFW.GLFW_KEY_F1)) {
+			if (showHelp) {
+				help.setText("F1: Help");
+			} else {
+				help.setText("F1: Help\n" +
+					"F2: Toggle shading\n" +
+					"F3: Toggle texture\n" +
+					"F4: Toggle music\n" +
+					"F5: Rewind music\n" +
+					"F11: Toggle fullscreen\n" +
+					"Left mouse button drag: Rotate cube\n" +
+					"Mouse scroll: Zoom in / out\n" +
+					"Left / right arrow key: Move sprite\n");
+			}
+			showHelp = !showHelp;
+			help.update();
 		} else if (input.isKeyReleased(GLFW.GLFW_KEY_F2)) {
 			if (cubeShader == shader) {
 				cubeShader = noshader;
@@ -131,6 +152,8 @@ public class Demo implements Module {
 		} else if (input.isKeyReleased(GLFW.GLFW_KEY_F4)) {
 			if (source.isPlaying()) {
 				source.pause();
+			} else if (source.isPaused()) {
+				source.resume();
 			} else {
 				source.play();
 			}
@@ -164,10 +187,12 @@ public class Demo implements Module {
 			text.setText(text.getText() + "\n");
 			text.update();
 		} else if (input.isKeyPressed(GLFW.GLFW_KEY_TAB) || input.isKeyRepeated(GLFW.GLFW_KEY_TAB)) {
-			text.setText(text.getText() + "    ");
-			text.update();
+			if (text.getOffset() < 450.0f) {
+				text.setText(text.getText() + "    ");
+				text.update();
+			}
 		}
-		if (input.hasCharEvent()) {
+		if (input.hasCharEvent() && text.getOffset() < 450.0f) {
 			while (input.hasCharEvent()) {
 				char ch = input.getCharEvent();
 				text.setText(text.getText() + ch);
@@ -245,6 +270,14 @@ public class Demo implements Module {
 		noshader.setUniform("enableTexture", true);
 		noshader.setUniform("textureUnit", 0);
 		text.render();
+		noshader.setUniform("modelViewMatrix", new Matrix4f()
+			.translate(-width / 2.0f + 10.0f, (int) (height / 2.0f - 30.0f), 0.0f));
+		if (showHelp) {
+			noshader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+		} else {
+			noshader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 0.5f));
+		}
+		help.render();
 		noshader.unbind();
 
 		GL11.glDisable(GL11.GL_BLEND);
