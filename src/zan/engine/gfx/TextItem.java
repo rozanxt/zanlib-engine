@@ -11,36 +11,40 @@ public class TextItem {
 		public final float[] pos;
 		public final float[] tex;
 		public final int[] ind;
+		public final int lines;
+		public final float offset;
+		public final float width;
 
-		public TextBuild(String text, TextFont font, int width) {
+		public TextBuild(String text, TextFont font, float maxWidth) {
 			List<Float> pos = new ArrayList<>();
 			List<Float> tex = new ArrayList<>();
 			List<Integer> ind = new ArrayList<>();
 			char[] chars = text.toCharArray();
 
-			float offsetX = 0.0f;
 			int line = 0;
+			float offset = 0.0f;
+			float width = 0.0f;
 			int fontWidth = font.getTexture().getWidth();
 			int fontHeight = font.getTexture().getHeight();
 			for (int i = 0; i < chars.length; i++) {
 				TextFont.CharInfo data = font.getCharInfo(chars[i]);
 
-				pos.add(offsetX);
+				pos.add(offset);
 				pos.add((float) -line * fontHeight);
 				tex.add((float) data.x / (float) fontWidth);
 				tex.add(1.0f);
 
-				pos.add(offsetX + data.w);
+				pos.add(offset + data.w);
 				pos.add((float) -line * fontHeight);
 				tex.add((float) (data.x + data.w) / (float) fontWidth);
 				tex.add(1.0f);
 
-				pos.add(offsetX + data.w);
+				pos.add(offset + data.w);
 				pos.add((float) (1 - line) * fontHeight);
 				tex.add((float) (data.x + data.w) / (float) fontWidth);
 				tex.add(0.0f);
 
-				pos.add(offsetX);
+				pos.add(offset);
 				pos.add((float) (1 - line) * fontHeight);
 				tex.add((float) data.x / (float) fontWidth);
 				tex.add(0.0f);
@@ -52,11 +56,14 @@ public class TextItem {
 				ind.add(4 * i);
 				ind.add(4 * i + 2);
 
-				offsetX += data.w;
+				offset += data.w;
 
-				if (width > 0) {
-					if (chars[i] == '\n' || (chars[i] == ' ' && offsetX > width)) {
-						offsetX = 0.0f;
+				if (offset > width) {
+					width = offset;
+				}
+				if (maxWidth > 0) {
+					if (chars[i] == '\n' || (chars[i] == ' ' && offset > maxWidth)) {
+						offset = 0.0f;
 						line++;
 					}
 				}
@@ -65,21 +72,30 @@ public class TextItem {
 			this.pos = TypeConverter.FloatListToArray(pos);
 			this.tex = TypeConverter.FloatListToArray(tex);
 			this.ind = TypeConverter.IntegerListToArray(ind);
+			this.lines = line + 1;
+			this.offset = offset;
+			this.width = width;
 		}
 	}
 
 	private String text;
 	private TextFont font;
 
-	private int width;
+	private int lines;
+	private float offset;
+	private float width;
+	private float maxWidth;
 
 	private final Mesh2D mesh;
 
-	public TextItem(String text, TextFont font, int width) {
+	public TextItem(String text, TextFont font, float maxWidth) {
+		TextBuild build = new TextBuild(text, font, maxWidth);
 		this.text = text;
 		this.font = font;
-		this.width = width;
-		TextBuild build = new TextBuild(text, font, width);
+		this.maxWidth = maxWidth;
+		lines = build.lines;
+		offset = build.offset;
+		width = build.width;
 		mesh = new Mesh2D(build.pos, build.tex, build.ind);
 	}
 
@@ -87,8 +103,8 @@ public class TextItem {
 		this(text, font, 0);
 	}
 
-	public TextItem(TextFont font, int width) {
-		this("", font, width);
+	public TextItem(TextFont font, float maxWidth) {
+		this("", font, maxWidth);
 	}
 
 	public TextItem(TextFont font) {
@@ -100,7 +116,10 @@ public class TextItem {
 	}
 
 	public void update() {
-		TextBuild build = new TextBuild(text, font, width);
+		TextBuild build = new TextBuild(text, font, maxWidth);
+		lines = build.lines + 1;
+		offset = build.offset;
+		width = build.width;
 		mesh.bind();
 		mesh.setVertexData(Mesh2D.POS, build.pos);
 		mesh.setVertexData(Mesh2D.TEX, build.tex);
@@ -121,12 +140,36 @@ public class TextItem {
 		this.text = text;
 	}
 
+	public String getText() {
+		return text;
+	}
+
 	public void setFont(TextFont font) {
 		this.font = font;
 	}
 
-	public void setWidth(int width) {
-		this.width = width;
+	public TextFont getFont() {
+		return font;
+	}
+
+	public int getNumLines() {
+		return lines;
+	}
+
+	public float getOffset() {
+		return offset;
+	}
+
+	public float getWidth() {
+		return width;
+	}
+
+	public void setMaxWidth(int maxWidth) {
+		this.maxWidth = maxWidth;
+	}
+
+	public float getMaxWidth() {
+		return maxWidth;
 	}
 
 }

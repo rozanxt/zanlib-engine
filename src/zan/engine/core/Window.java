@@ -37,6 +37,8 @@ public class Window {
 		public boolean minimized = false;
 		public boolean visible = true;
 
+		public int samples = 0;
+
 		public Attributes(int width, int height) {
 			this.width = width;
 			this.height = height;
@@ -71,6 +73,7 @@ public class Window {
 		glfwWindowHint(GLFW_AUTO_ICONIFY, attr.autoiconify ? GL_TRUE : GL_FALSE);
 		glfwWindowHint(GLFW_FLOATING, attr.floating ? GL_TRUE : GL_FALSE);
 		glfwWindowHint(GLFW_MAXIMIZED, attr.maximized ? GL_TRUE : GL_FALSE);
+		glfwWindowHint(GLFW_SAMPLES, attr.samples);
 	}
 
 	private void initWindow() {

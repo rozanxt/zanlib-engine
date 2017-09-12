@@ -2,13 +2,13 @@
 
 in vec3 modelViewPosition;
 in vec3 modelViewNormal;
-in vec2 fragmentCoord;
+in vec2 fragmentTexCoord;
 
 out vec4 result;
 
-uniform bool useTexture;
+uniform vec4 uniformColor;
+uniform bool enableTexture;
 uniform sampler2D textureUnit;
-uniform vec4 tintColor;
 
 void main() {
 	vec3 lightPosition = vec3(0.0, 0.0, 0.0);
@@ -18,7 +18,7 @@ void main() {
 	float diffuse = max(dot(modelViewNormal, lightVector), 0.0);
 	diffuse = diffuse * (1.0 / (1.0 + (0.05 * lightDistance * lightDistance)));
 	diffuse = diffuse + 0.3;
-	vec4 color = tintColor;
-	if (useTexture) color = color * texture2D(textureUnit, fragmentCoord); 
+	vec4 color = uniformColor;
+	if (enableTexture) color = color * texture2D(textureUnit, fragmentTexCoord);
 	result = vec4(diffuse * color.xyz, color.w);
 }

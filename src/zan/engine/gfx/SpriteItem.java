@@ -13,15 +13,23 @@ public class SpriteItem {
 
 	private Mesh2D mesh;
 
+	private float width;
+	private float height;
+
+	private int cols;
+	private int rows;
+
 	public SpriteItem(Texture sheet, int cols, int rows) {
 		this.sheet = sheet;
+		this.cols = cols;
+		this.rows = rows;
 		List<Float> positions = new ArrayList<>();
 		List<Float> texcoords = new ArrayList<>();
 		List<Integer> indices = new ArrayList<>();
 		float sheetWidth = (float) sheet.getWidth();
 		float sheetHeight = (float) sheet.getHeight();
-		float width = sheetWidth / (float) cols;
-		float height = sheetHeight / (float) rows;
+		width = sheetWidth / (float) cols;
+		height = sheetHeight / (float) rows;
 		for (int j = 0; j < rows; j++) {
 			for (int i = 0; i < cols; i++) {
 				positions.add(0.0f);
@@ -73,6 +81,22 @@ public class SpriteItem {
 
 	public void render() {
 		render(0);
+	}
+
+	public float getWidth() {
+		return width;
+	}
+
+	public float getHeight() {
+		return height;
+	}
+
+	public int getCols() {
+		return cols;
+	}
+
+	public int getRows() {
+		return rows;
 	}
 
 }

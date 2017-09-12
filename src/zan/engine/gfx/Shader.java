@@ -51,6 +51,10 @@ public class Shader {
 		return uniforms.get(uniform);
 	}
 
+	public void setUniform(String uniform, boolean value) {
+		glUniform1i(getUniform(uniform), value ? GL_TRUE : GL_FALSE);
+	}
+
 	public void setUniform(String uniform, int value) {
 		glUniform1i(getUniform(uniform), value);
 	}
@@ -108,6 +112,39 @@ public class Shader {
 
 	public static Shader loadFromFile(String vertexPath, String fragmentPath) {
 		return new Shader(TextResource.loadFromFileAsString(vertexPath), TextResource.loadFromFileAsString(fragmentPath));
+	}
+
+	public static Shader loadDefault() {
+		String vertexSource = "#version 330\n" +
+			"\n" +
+			"layout (location = 0) in vec3 vertexPosition;\n" +
+			"layout (location = 1) in vec2 vertexTexCoord;\n" +
+			"\n" +
+			"out vec2 fragmentTexCoord;\n" +
+			"\n" +
+			"uniform mat4 projectionMatrix;\n" +
+			"uniform mat4 modelViewMatrix;\n" +
+			"\n" +
+			"void main() {\n" +
+			"	gl_Position = projectionMatrix * modelViewMatrix * vec4(vertexPosition, 1.0);\n" +
+			"	fragmentTexCoord = vertexTexCoord;\n" +
+			"}\n";
+		String fragmentSource = "#version 330\n" +
+			"\n" +
+			"in vec2 fragmentTexCoord;\n" +
+			"\n" +
+			"out vec4 result;\n" +
+			"\n" +
+			"uniform vec4 uniformColor;\n" +
+			"uniform bool enableTexture;\n" +
+			"uniform sampler2D textureUnit;\n" +
+			"\n" +
+			"void main() {\n" +
+			"	vec4 color = uniformColor;\n" +
+			"	if (enableTexture) color = color * texture2D(textureUnit, fragmentTexCoord); \n" +
+			"	result = color;\n" +
+			"}\n";
+		return new Shader(vertexSource, fragmentSource);
 	}
 
 }
