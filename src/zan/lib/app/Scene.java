@@ -1,4 +1,4 @@
-package zan.lib.core;
+package zan.lib.app;
 
 public interface Scene {
 

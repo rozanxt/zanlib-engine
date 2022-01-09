@@ -1,11 +1,11 @@
-package zan.lib.demo;
+package zan.lib.sbx;
 
 import org.lwjgl.glfw.GLFW;
 
-import zan.lib.core.Engine;
-import zan.lib.core.Input;
-import zan.lib.core.Scene;
-import zan.lib.core.Window;
+import zan.lib.app.Engine;
+import zan.lib.app.Input;
+import zan.lib.app.Scene;
+import zan.lib.app.Window;
 
 public class Barebone implements Scene {
 

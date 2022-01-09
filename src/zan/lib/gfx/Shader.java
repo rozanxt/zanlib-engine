@@ -12,7 +12,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryStack;
 
-import zan.lib.util.TextResource;
+import zan.lib.utl.TextResource;
 
 public class Shader {
 

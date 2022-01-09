@@ -1,4 +1,4 @@
-package zan.lib.demo;
+package zan.lib.sbx;
 
 import java.awt.Font;
 
@@ -7,10 +7,10 @@ import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import zan.lib.core.Engine;
-import zan.lib.core.Input;
-import zan.lib.core.Scene;
-import zan.lib.core.Window;
+import zan.lib.app.Engine;
+import zan.lib.app.Input;
+import zan.lib.app.Scene;
+import zan.lib.app.Window;
 import zan.lib.gfx.Mesh;
 import zan.lib.gfx.OBJLoader;
 import zan.lib.gfx.Shader;
@@ -22,7 +22,7 @@ import zan.lib.sfx.SoundData;
 import zan.lib.sfx.SoundSource;
 import zan.lib.sfx.SoundSystem;
 
-public class Demonstration implements Scene {
+public class Sandbox implements Scene {
 
 	private Engine engine;
 
@@ -53,7 +53,7 @@ public class Demonstration implements Scene {
 	private SoundData sound;
 	private SoundSource source;
 
-	public Demonstration(Engine engine) {
+	public Sandbox(Engine engine) {
 		this.engine = engine;
 	}
 
@@ -89,7 +89,7 @@ public class Demonstration implements Scene {
 		spriteFlip = false;
 
 		font = new TextFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-		text = new TextItem("ZanLibrary", font);
+		text = new TextItem("ZanLibEngine", font);
 		help = new TextItem("F1: Help", font);
 		showHelp = false;
 
@@ -288,11 +288,11 @@ public class Demonstration implements Scene {
 	public static void main(String[] args) {
 		Engine engine = new Engine(60, 50);
 		Window.Attributes attr = new Window.Attributes(640, 480);
-		attr.title = "Demonstration";
+		attr.title = "Sandbox";
 		attr.icon = "res/ico/icon.png";
 		Window window = new Window(attr);
 		Input input = new Input(window);
-		Scene scene = new Demonstration(engine);
+		Scene scene = new Sandbox(engine);
 		engine.setWindow(window);
 		engine.setInput(input);
 		engine.setScene(scene);

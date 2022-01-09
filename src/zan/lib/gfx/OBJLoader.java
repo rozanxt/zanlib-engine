@@ -7,8 +7,8 @@ import java.util.List;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import zan.lib.util.TextResource;
-import zan.lib.util.TypeConverter;
+import zan.lib.utl.TextResource;
+import zan.lib.utl.TypeConverter;
 
 public final class OBJLoader {
 

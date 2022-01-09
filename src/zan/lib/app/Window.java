@@ -1,4 +1,4 @@
-package zan.lib.core;
+package zan.lib.app;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -158,7 +158,7 @@ public class Window {
 				IntBuffer h = stack.mallocInt(1);
 				IntBuffer c = stack.mallocInt(1);
 				ByteBuffer ico = STBImage.stbi_load(icon, w, h, c, 4);
-				GLFW.glfwSetWindowIcon(handle, GLFWImage.mallocStack(1, stack).width(w.get(0)).height(h.get(0)).pixels(ico));
+				GLFW.glfwSetWindowIcon(handle, GLFWImage.malloc(1, stack).width(w.get(0)).height(h.get(0)).pixels(ico));
 				STBImage.stbi_image_free(ico);
 			}
 		}

@@ -1,4 +1,4 @@
-package zan.lib.util;
+package zan.lib.utl;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

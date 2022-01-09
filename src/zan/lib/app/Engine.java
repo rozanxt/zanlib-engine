@@ -1,4 +1,4 @@
-package zan.lib.core;
+package zan.lib.app;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;

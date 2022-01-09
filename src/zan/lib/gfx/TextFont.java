@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.util.TypeConverter;
+import zan.lib.utl.TypeConverter;
 
 public class TextFont {
 
