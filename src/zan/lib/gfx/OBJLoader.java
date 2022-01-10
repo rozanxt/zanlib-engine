@@ -7,29 +7,28 @@ import java.util.List;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import zan.lib.utl.TextResource;
-import zan.lib.utl.TypeConverter;
+import zan.lib.utl.Utility;
 
 public final class OBJLoader {
 
 	private static class Group {
-		public static final int NO_VALUE = -1;
-		public int pos = NO_VALUE;
-		public int tex = NO_VALUE;
-		public int nrm = NO_VALUE;
+
+		private static final int NO_VALUE = -1;
+
+		private int pos = NO_VALUE;
+		private int tex = NO_VALUE;
+		private int nrm = NO_VALUE;
+
 	}
 
 	private static class Face {
+
 		private Group[] groups = new Group[3];
 
-		public Face(String t0, String t1, String t2) {
+		private Face(String t0, String t1, String t2) {
 			groups[0] = parseToken(t0);
 			groups[1] = parseToken(t1);
 			groups[2] = parseToken(t2);
-		}
-
-		public Group[] getGroups() {
-			return groups;
 		}
 
 		private Group parseToken(String token) {
@@ -38,13 +37,14 @@ public final class OBJLoader {
 			int length = items.length;
 			group.pos = Integer.parseInt(items[0]) - 1;
 			if (length > 1) {
-				group.tex = items[1].length() > 0 ? Integer.parseInt(items[1]) - 1 : Group.NO_VALUE;
+				group.tex = (items[1].length() > 0) ? (Integer.parseInt(items[1]) - 1) : Group.NO_VALUE;
 				if (length > 2) {
 					group.nrm = Integer.parseInt(items[2]) - 1;
 				}
 			}
 			return group;
 		}
+
 	}
 
 	private OBJLoader() {
@@ -52,7 +52,7 @@ public final class OBJLoader {
 	}
 
 	public static Mesh3D loadFromFile(String path) {
-		return parseOBJ(TextResource.loadFromFileAsStringList(path));
+		return parseOBJ(Utility.loadFromFileAsStringList(path));
 	}
 
 	public static Mesh3D parseOBJ(String data) {
@@ -109,8 +109,7 @@ public final class OBJLoader {
 		}
 
 		for (Face face : faces) {
-			Group[] groups = face.getGroups();
-			for (Group group : groups) {
+			for (Group group : face.groups) {
 				indices.add(group.pos);
 				if (group.tex > Group.NO_VALUE) {
 					Vector2f tex = texcoords.get(group.tex);
@@ -126,7 +125,7 @@ public final class OBJLoader {
 			}
 		}
 
-		return new Mesh3D(posArr, texArr, nrmArr, TypeConverter.IntegerListToArray(indices));
+		return new Mesh3D(posArr, texArr, nrmArr, Utility.IntegerListToArray(indices));
 	}
 
 }

@@ -1,116 +1,167 @@
 package zan.lib.gfx;
 
+import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.opengl.GL20.GL_ACTIVE_UNIFORMS;
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
+import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glDetachShader;
+import static org.lwjgl.opengl.GL20.glGetActiveUniform;
+import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
+import static org.lwjgl.opengl.GL20.glGetProgrami;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
+import static org.lwjgl.opengl.GL20.glGetShaderi;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glUniform2f;
+import static org.lwjgl.opengl.GL20.glUniform2i;
+import static org.lwjgl.opengl.GL20.glUniform3f;
+import static org.lwjgl.opengl.GL20.glUniform3i;
+import static org.lwjgl.opengl.GL20.glUniform4f;
+import static org.lwjgl.opengl.GL20.glUniform4i;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.glUseProgram;
+
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
+import org.joml.Matrix4fc;
+import org.joml.Vector2fc;
+import org.joml.Vector2ic;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
+import org.joml.Vector4fc;
+import org.joml.Vector4ic;
 import org.lwjgl.system.MemoryStack;
 
-import zan.lib.utl.TextResource;
+import zan.lib.utl.Utility;
 
 public class Shader {
 
-	private final Map<String, Integer> uniforms;
-
 	private final int program;
 
+	private final Map<String, Integer> uniforms;
+
 	public Shader(String vertexSource, String fragmentSource) {
-		uniforms = new HashMap<>();
-		program = GL20.glCreateProgram();
+		program = glCreateProgram();
 		createProgram(vertexSource, fragmentSource);
+
+		uniforms = new HashMap<>();
+		assignUniforms();
 	}
 
 	public static Shader loadFromFile(String vertexPath, String fragmentPath) {
-		return new Shader(TextResource.loadFromFileAsString(vertexPath), TextResource.loadFromFileAsString(fragmentPath));
-	}
-
-	public void delete() {
-		GL20.glDeleteProgram(program);
-	}
-
-	public void bind() {
-		GL20.glUseProgram(program);
-	}
-
-	public void unbind() {
-		GL20.glUseProgram(0);
-	}
-
-	public void addUniform(String uniform) {
-		int location = GL20.glGetUniformLocation(program, uniform);
-		if (location < 0) {
-			System.err.println("Unable to find uniform '" + uniform + "'!");
-		}
-		uniforms.put(uniform, location);
-	}
-
-	public int getUniform(String uniform) {
-		return uniforms.get(uniform);
-	}
-
-	public void setUniform(String uniform, boolean value) {
-		GL20.glUniform1i(getUniform(uniform), value ? GL11.GL_TRUE : GL11.GL_FALSE);
-	}
-
-	public void setUniform(String uniform, int value) {
-		GL20.glUniform1i(getUniform(uniform), value);
-	}
-
-	public void setUniform(String uniform, float value) {
-		GL20.glUniform1f(getUniform(uniform), value);
-	}
-
-	public void setUniform(String uniform, Vector2f value) {
-		GL20.glUniform2f(getUniform(uniform), value.x, value.y);
-	}
-
-	public void setUniform(String uniform, Vector3f value) {
-		GL20.glUniform3f(getUniform(uniform), value.x, value.y, value.z);
-	}
-
-	public void setUniform(String uniform, Vector4f value) {
-		GL20.glUniform4f(getUniform(uniform), value.x, value.y, value.z, value.w);
-	}
-
-	public void setUniform(String uniform, Matrix4f value) {
-		try (MemoryStack stack = MemoryStack.stackPush()) {
-			FloatBuffer buffer = stack.mallocFloat(16);
-			value.get(buffer);
-			GL20.glUniformMatrix4fv(getUniform(uniform), false, buffer);
-		}
+		return new Shader(Utility.loadFromFileAsString(vertexPath), Utility.loadFromFileAsString(fragmentPath));
 	}
 
 	private void createProgram(String vertexSource, String fragmentSource) {
-		int vertexShader = createShader(vertexSource, GL20.GL_VERTEX_SHADER);
-		int fragmentShader = createShader(fragmentSource, GL20.GL_FRAGMENT_SHADER);
-		GL20.glLinkProgram(program);
-		if (GL20.glGetProgrami(program, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Unable to link shader program " + program + ":\n" + GL20.glGetProgramInfoLog(program));
+		int vertexShader = createShader(vertexSource, GL_VERTEX_SHADER);
+		int fragmentShader = createShader(fragmentSource, GL_FRAGMENT_SHADER);
+		glLinkProgram(program);
+		if (glGetProgrami(program, GL_LINK_STATUS) == GL_FALSE) {
+			System.err.println("Unable to link shader program " + program + ":\n" + glGetProgramInfoLog(program));
 		}
 		deleteShader(vertexShader);
 		deleteShader(fragmentShader);
 	}
 
 	private int createShader(String source, int type) {
-		int shader = GL20.glCreateShader(type);
-		GL20.glShaderSource(shader, source);
-		GL20.glCompileShader(shader);
-		if (GL20.glGetShaderi(shader, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Unable to compile shader " + shader + " of type " + type + ":\n" + GL20.glGetShaderInfoLog(shader));
+		int shader = glCreateShader(type);
+		glShaderSource(shader, source);
+		glCompileShader(shader);
+		if (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_FALSE) {
+			System.err.println("Unable to compile shader " + shader + " of type " + type + ":\n" + glGetShaderInfoLog(shader));
 		}
-		GL20.glAttachShader(program, shader);
+		glAttachShader(program, shader);
 		return shader;
 	}
 
 	private void deleteShader(int shader) {
-		GL20.glDetachShader(program, shader);
-		GL20.glDeleteShader(shader);
+		glDetachShader(program, shader);
+		glDeleteShader(shader);
+	}
+
+	private void assignUniforms() {
+		int count = glGetProgrami(program, GL_ACTIVE_UNIFORMS);
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer size = stack.mallocInt(1);
+			IntBuffer type = stack.mallocInt(1);
+			for (int i = 0; i < count; i++) {
+				uniforms.put(glGetActiveUniform(program, i, size, type), i);
+			}
+		}
+	}
+
+	public void delete() {
+		glDeleteProgram(program);
+	}
+
+	public void bind() {
+		glUseProgram(program);
+	}
+
+	public void unbind() {
+		glUseProgram(0);
+	}
+
+	public void setUniform(String uniform, boolean value) {
+		glUniform1i(getUniform(uniform), value ? GL_TRUE : GL_FALSE);
+	}
+
+	public void setUniform(String uniform, int value) {
+		glUniform1i(getUniform(uniform), value);
+	}
+
+	public void setUniform(String uniform, Vector2ic value) {
+		glUniform2i(getUniform(uniform), value.x(), value.y());
+	}
+
+	public void setUniform(String uniform, Vector3ic value) {
+		glUniform3i(getUniform(uniform), value.x(), value.y(), value.z());
+	}
+
+	public void setUniform(String uniform, Vector4ic value) {
+		glUniform4i(getUniform(uniform), value.x(), value.y(), value.z(), value.w());
+	}
+
+	public void setUniform(String uniform, float value) {
+		glUniform1f(getUniform(uniform), value);
+	}
+
+	public void setUniform(String uniform, Vector2fc value) {
+		glUniform2f(getUniform(uniform), value.x(), value.y());
+	}
+
+	public void setUniform(String uniform, Vector3fc value) {
+		glUniform3f(getUniform(uniform), value.x(), value.y(), value.z());
+	}
+
+	public void setUniform(String uniform, Vector4fc value) {
+		glUniform4f(getUniform(uniform), value.x(), value.y(), value.z(), value.w());
+	}
+
+	public void setUniform(String uniform, Matrix4fc value) {
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			FloatBuffer buffer = stack.mallocFloat(16);
+			value.get(buffer);
+			glUniformMatrix4fv(getUniform(uniform), false, buffer);
+		}
+	}
+
+	public int getUniform(String uniform) {
+		return uniforms.get(uniform);
 	}
 
 }

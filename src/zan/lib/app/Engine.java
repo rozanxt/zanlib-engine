@@ -1,6 +1,9 @@
 package zan.lib.app;
 
-import org.lwjgl.glfw.GLFW;
+import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
+
 import org.lwjgl.glfw.GLFWErrorCallback;
 
 public class Engine implements Runnable {
@@ -17,16 +20,9 @@ public class Engine implements Runnable {
 	private int currentFPS;
 	private int currentUPS;
 
-	public Engine(Window window, Input input, Scene scene, int targetFPS, int targetUPS) {
-		this.window = window;
-		this.input = input;
-		this.scene = scene;
+	public Engine(int targetFPS, int targetUPS) {
 		this.targetFPS = targetFPS;
 		this.targetUPS = targetUPS;
-	}
-
-	public Engine(int targetFPS, int targetUPS) {
-		this(null, null, null, targetFPS, targetUPS);
 	}
 
 	public void start() {
@@ -48,7 +44,7 @@ public class Engine implements Runnable {
 
 	private void init() {
 		GLFWErrorCallback.createPrint(System.err).set();
-		if (!GLFW.glfwInit()) throw new IllegalStateException("Unable to initialize GLFW!");
+		if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW!");
 		if (window != null) window.init();
 		if (input != null) input.init();
 		if (scene != null) scene.init();
@@ -72,13 +68,13 @@ public class Engine implements Runnable {
 			nextFrame += deltaFPS;
 
 			while (updateTime >= deltaUPS) {
-				if (scene != null) scene.update();
+				if (scene != null) scene.update((float) updateTime / (float) deltaUPS);
 				if (input != null) input.clear();
 				updateTime -= deltaUPS;
 				countUPS++;
 			}
 
-			if (scene != null) scene.render();
+			if (scene != null) scene.render((float) updateTime / (float) deltaUPS);
 			window.refresh();
 			countFPS++;
 
@@ -107,8 +103,8 @@ public class Engine implements Runnable {
 		if (scene != null) scene.exit();
 		if (input != null) input.exit();
 		if (window != null) window.exit();
-		GLFW.glfwTerminate();
-		GLFW.glfwSetErrorCallback(null).free();
+		glfwTerminate();
+		glfwSetErrorCallback(null).free();
 	}
 
 	public void setWindow(Window window) {

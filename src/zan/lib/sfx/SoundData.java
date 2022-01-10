@@ -1,24 +1,30 @@
 package zan.lib.sfx;
 
+import static org.lwjgl.openal.AL10.AL_FORMAT_MONO16;
+import static org.lwjgl.openal.AL10.AL_FORMAT_STEREO16;
+import static org.lwjgl.openal.AL10.alBufferData;
+import static org.lwjgl.openal.AL10.alDeleteBuffers;
+import static org.lwjgl.openal.AL10.alGenBuffers;
+
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.lwjgl.openal.AL10;
 import org.lwjgl.stb.STBVorbis;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.libc.LibCStdlib;
 
 public class SoundData {
 
-	private final int id;
-	private final int format;
-	private final int sampling;
+	private final int index;
 
-	public SoundData(ShortBuffer data, int format, int sampling) {
-		id = AL10.alGenBuffers();
+	private final int format;
+	private final int sample;
+
+	public SoundData(ShortBuffer data, int format, int sample) {
+		index = alGenBuffers();
 		this.format = format;
-		this.sampling = sampling;
-		AL10.alBufferData(id, format, data, sampling);
+		this.sample = sample;
+		alBufferData(index, format, data, sample);
 	}
 
 	public static SoundData loadFromFile(String path) {
@@ -31,9 +37,9 @@ public class SoundData {
 			int sampling = s.get();
 			int format = -1;
 			if (channels == 1) {
-				format = AL10.AL_FORMAT_MONO16;
+				format = AL_FORMAT_MONO16;
 			} else if (channels == 2) {
-				format = AL10.AL_FORMAT_STEREO16;
+				format = AL_FORMAT_STEREO16;
 			}
 			sound = new SoundData(data, format, sampling);
 			LibCStdlib.free(data);
@@ -42,19 +48,19 @@ public class SoundData {
 	}
 
 	public void delete() {
-		AL10.alDeleteBuffers(id);
+		alDeleteBuffers(index);
 	}
 
-	public int getID() {
-		return id;
+	public int getIndex() {
+		return index;
 	}
 
 	public int getFormat() {
 		return format;
 	}
 
-	public int getSampling() {
-		return sampling;
+	public int getSampleRate() {
+		return sample;
 	}
 
 }

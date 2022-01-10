@@ -1,6 +1,7 @@
 package zan.lib.sbx;
 
-import org.lwjgl.glfw.GLFW;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
 
 import zan.lib.app.Engine;
 import zan.lib.app.Input;
@@ -26,26 +27,27 @@ public class Barebone implements Scene {
 	}
 
 	@Override
-	public void update() {
+	public void update(float theta) {
 		Window window = engine.getWindow();
 		Input input = engine.getInput();
-		if (input.isKeyReleased(GLFW.GLFW_KEY_ESCAPE)) {
+
+		if (input.isKeyReleased(GLFW_KEY_ESCAPE)) {
 			window.close();
-		} else if (input.isKeyReleased(GLFW.GLFW_KEY_F11)) {
+		} else if (input.isKeyReleased(GLFW_KEY_F11)) {
 			window.setFullScreen(!window.isFullScreen());
 		}
 	}
 
 	@Override
-	public void render() {
+	public void render(float theta) {
 
 	}
 
 	public static void main(String[] args) {
-		Engine engine = new Engine(60, 50);
-		Window.Attributes attr = new Window.Attributes(640, 480);
-		attr.title = "Barebone";
-		Window window = new Window(attr);
+		Engine engine = new Engine(60, 20);
+		Window.Attributes attrib = new Window.Attributes(640, 480);
+		attrib.title = "Barebone";
+		Window window = new Window(attrib);
 		Input input = new Input(window);
 		Scene scene = new Barebone(engine);
 		engine.setWindow(window);

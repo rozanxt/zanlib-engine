@@ -14,11 +14,12 @@ import java.util.Map;
 
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.utl.TypeConverter;
+import zan.lib.utl.Utility;
 
 public class TextFont {
 
 	public static class CharInfo {
+
 		public final int x;
 		public final int w;
 
@@ -26,11 +27,12 @@ public class TextFont {
 			this.x = x;
 			this.w = w;
 		}
+
 	}
 
 	private final Map<Character, CharInfo> fontInfo;
 
-	private final Texture fontTexture;
+	private final Texture texture;
 
 	public TextFont(Font font, String charset) {
 		CharsetEncoder ce = Charset.forName(charset).newEncoder();
@@ -72,8 +74,8 @@ public class TextFont {
 		g2d.drawString(textureChars, 0, fm.getAscent());
 		g2d.dispose();
 
-		ByteBuffer buffer = TypeConverter.BufferedImageToByteBuffer(bi);
-		fontTexture = new Texture(buffer, bi.getWidth(), bi.getHeight());
+		ByteBuffer buffer = Utility.BufferedImageToByteBuffer(bi);
+		texture = new Texture(buffer, bi.getWidth(), bi.getHeight());
 		MemoryUtil.memFree(buffer);
 	}
 
@@ -82,7 +84,7 @@ public class TextFont {
 	}
 
 	public void delete() {
-		fontTexture.delete();
+		texture.delete();
 	}
 
 	public CharInfo getCharInfo(char ch) {
@@ -90,7 +92,7 @@ public class TextFont {
 	}
 
 	public Texture getTexture() {
-		return fontTexture;
+		return texture;
 	}
 
 }

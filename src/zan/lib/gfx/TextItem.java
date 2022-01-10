@@ -3,50 +3,55 @@ package zan.lib.gfx;
 import java.util.ArrayList;
 import java.util.List;
 
-import zan.lib.utl.TypeConverter;
+import zan.lib.utl.Utility;
 
 public class TextItem {
 
 	private static class TextBuild {
-		public final float[] pos;
-		public final float[] tex;
-		public final int[] ind;
-		public final int lines;
-		public final float offset;
-		public final float width;
 
-		public TextBuild(String text, TextFont font, float maxWidth) {
+		private final float[] pos;
+		private final float[] tex;
+		private final int[] ind;
+
+		private final int lines;
+		private final float offset;
+		private final float width;
+
+		private TextBuild(String text, TextFont font, float maxWidth) {
 			List<Float> pos = new ArrayList<>();
 			List<Float> tex = new ArrayList<>();
 			List<Integer> ind = new ArrayList<>();
-			char[] chars = text.toCharArray();
 
 			int line = 0;
 			float offset = 0.0f;
 			float width = 0.0f;
-			int fontWidth = font.getTexture().getWidth();
-			int fontHeight = font.getTexture().getHeight();
+
+			float fontWidth = font.getTexture().getWidth();
+			float fontHeight = font.getTexture().getHeight();
+
+			char[] chars = text.toCharArray();
+
 			for (int i = 0; i < chars.length; i++) {
 				TextFont.CharInfo data = font.getCharInfo(chars[i]);
 
 				pos.add(offset);
-				pos.add((float) -line * fontHeight);
-				tex.add((float) data.x / (float) fontWidth);
+				pos.add(-line * fontHeight);
+				tex.add(data.x / fontWidth);
 				tex.add(1.0f);
 
 				pos.add(offset + data.w);
-				pos.add((float) -line * fontHeight);
-				tex.add((float) (data.x + data.w) / (float) fontWidth);
+				pos.add(-line * fontHeight);
+				tex.add((data.x + data.w) / fontWidth);
 				tex.add(1.0f);
 
 				pos.add(offset + data.w);
-				pos.add((float) (1 - line) * fontHeight);
-				tex.add((float) (data.x + data.w) / (float) fontWidth);
+				pos.add((1 - line) * fontHeight);
+				tex.add((data.x + data.w) / fontWidth);
 				tex.add(0.0f);
 
 				pos.add(offset);
-				pos.add((float) (1 - line) * fontHeight);
-				tex.add((float) data.x / (float) fontWidth);
+				pos.add((1 - line) * fontHeight);
+				tex.add(data.x / fontWidth);
 				tex.add(0.0f);
 
 				ind.add(4 * i);
@@ -67,22 +72,26 @@ public class TextItem {
 				}
 			}
 
-			this.pos = TypeConverter.FloatListToArray(pos);
-			this.tex = TypeConverter.FloatListToArray(tex);
-			this.ind = TypeConverter.IntegerListToArray(ind);
+			this.pos = Utility.FloatListToArray(pos);
+			this.tex = Utility.FloatListToArray(tex);
+			this.ind = Utility.IntegerListToArray(ind);
+
 			this.lines = line + 1;
 			this.offset = offset;
 			this.width = width;
 		}
+
 	}
 
 	private String text;
+
 	private TextFont font;
+
+	private float maxWidth;
 
 	private int lines;
 	private float offset;
 	private float width;
-	private float maxWidth;
 
 	private final Mesh2D mesh;
 
@@ -115,7 +124,7 @@ public class TextItem {
 
 	public void update() {
 		TextBuild build = new TextBuild(text, font, maxWidth);
-		lines = build.lines + 1;
+		lines = build.lines;
 		offset = build.offset;
 		width = build.width;
 		mesh.bind();

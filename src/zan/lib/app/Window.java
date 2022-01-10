@@ -1,26 +1,60 @@
 package zan.lib.app;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
+import static org.lwjgl.glfw.GLFW.GLFW_AUTO_ICONIFY;
+import static org.lwjgl.glfw.GLFW.GLFW_DECORATED;
+import static org.lwjgl.glfw.GLFW.GLFW_DONT_CARE;
+import static org.lwjgl.glfw.GLFW.GLFW_FLOATING;
+import static org.lwjgl.glfw.GLFW.GLFW_FOCUSED;
+import static org.lwjgl.glfw.GLFW.GLFW_MAXIMIZED;
+import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
+import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
+import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowMonitor;
+import static org.lwjgl.glfw.GLFW.glfwIconifyWindow;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowIcon;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowMonitor;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
+import static org.lwjgl.glfw.GLFW.glfwShowWindow;
+import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import org.lwjgl.glfw.Callbacks;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
 public class Window {
 
 	public static class Attributes {
+
 		public String title = "";
 		public String icon = "";
 
-		public int x = GLFW.GLFW_DONT_CARE;
-		public int y = GLFW.GLFW_DONT_CARE;
+		public int x = GLFW_DONT_CARE;
+		public int y = GLFW_DONT_CARE;
 
 		public int width;
 		public int height;
@@ -42,20 +76,21 @@ public class Window {
 			this.width = width;
 			this.height = height;
 		}
+
 	}
 
-	private final Attributes attr;
+	private final Attributes attrib;
 
 	private int width;
 	private int height;
 
 	private long handle;
 
-	public Window(Attributes attr) {
-		this.attr = attr;
+	public Window(Attributes attrib) {
+		this.attrib = attrib;
 	}
 
-	public void init() {
+	void init() {
 		initHints();
 		initWindow();
 		initCallbacks();
@@ -64,124 +99,124 @@ public class Window {
 	}
 
 	private void initHints() {
-		GLFW.glfwDefaultWindowHints();
-		GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, attr.resizable ? GL11.GL_TRUE : GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, attr.decorated ? GL11.GL_TRUE : GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_FOCUSED, attr.focused ? GL11.GL_TRUE : GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, attr.autoiconify ? GL11.GL_TRUE : GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_FLOATING, attr.floating ? GL11.GL_TRUE : GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, attr.maximized ? GL11.GL_TRUE : GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, attr.samples);
+		glfwDefaultWindowHints();
+		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, attrib.resizable ? GL_TRUE : GL_FALSE);
+		glfwWindowHint(GLFW_DECORATED, attrib.decorated ? GL_TRUE : GL_FALSE);
+		glfwWindowHint(GLFW_FOCUSED, attrib.focused ? GL_TRUE : GL_FALSE);
+		glfwWindowHint(GLFW_AUTO_ICONIFY, attrib.autoiconify ? GL_TRUE : GL_FALSE);
+		glfwWindowHint(GLFW_FLOATING, attrib.floating ? GL_TRUE : GL_FALSE);
+		glfwWindowHint(GLFW_MAXIMIZED, attrib.maximized ? GL_TRUE : GL_FALSE);
+		glfwWindowHint(GLFW_SAMPLES, attrib.samples);
 	}
 
 	private void initWindow() {
-		long monitor = GLFW.glfwGetPrimaryMonitor();
-		GLFWVidMode vidmode = GLFW.glfwGetVideoMode(monitor);
+		long monitor = glfwGetPrimaryMonitor();
+		GLFWVidMode vidmode = glfwGetVideoMode(monitor);
 
-		if (attr.fullscreen) {
+		if (attrib.fullscreen) {
 			width = vidmode.width();
 			height = vidmode.height();
-			handle = GLFW.glfwCreateWindow(width, height, attr.title, monitor, MemoryUtil.NULL);
+			handle = glfwCreateWindow(width, height, attrib.title, monitor, NULL);
 		} else {
-			width = attr.width;
-			height = attr.height;
-			handle = GLFW.glfwCreateWindow(width, height, attr.title, MemoryUtil.NULL, MemoryUtil.NULL);
+			width = attrib.width;
+			height = attrib.height;
+			handle = glfwCreateWindow(width, height, attrib.title, NULL, NULL);
 		}
-		if (handle == MemoryUtil.NULL) {
+		if (handle == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window!");
 		}
 
-		if (attr.x == GLFW.GLFW_DONT_CARE && attr.y == GLFW.GLFW_DONT_CARE) {
-			attr.x = (vidmode.width() - attr.width) / 2;
-			attr.y = (vidmode.height() - attr.height) / 2;
+		if (attrib.x == GLFW_DONT_CARE && attrib.y == GLFW_DONT_CARE) {
+			attrib.x = (vidmode.width() - attrib.width) / 2;
+			attrib.y = (vidmode.height() - attrib.height) / 2;
 		}
-		GLFW.glfwSetWindowPos(handle, attr.x, attr.y);
+		glfwSetWindowPos(handle, attrib.x, attrib.y);
 
-		setIcon(attr.icon);
+		setIcon(attrib.icon);
 	}
 
 	private void initCallbacks() {
-		GLFW.glfwSetWindowPosCallback(handle, (window, x, y) -> {
-			if (!attr.fullscreen) {
-				attr.x = x;
-				attr.y = y;
+		glfwSetWindowPosCallback(handle, (window, x, y) -> {
+			if (!attrib.fullscreen) {
+				attrib.x = x;
+				attrib.y = y;
 			}
 		});
-		GLFW.glfwSetWindowSizeCallback(handle, (window, width, height) -> {
-			if (!attr.fullscreen) {
-				attr.width = width;
-				attr.height = height;
+		glfwSetWindowSizeCallback(handle, (window, width, height) -> {
+			if (!attrib.fullscreen) {
+				attrib.width = width;
+				attrib.height = height;
 			}
 		});
-		GLFW.glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
+		glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
 			this.width = width;
 			this.height = height;
 		});
 	}
 
 	private void initContext() {
-		GLFW.glfwMakeContextCurrent(handle);
-		GLFW.glfwSwapInterval(attr.vsync ? 1 : 0);
+		glfwMakeContextCurrent(handle);
+		glfwSwapInterval(attrib.vsync ? 1 : 0);
 		GL.createCapabilities();
 	}
 
 	private void initFinish() {
-		if (attr.minimized) GLFW.glfwIconifyWindow(handle);
-		if (attr.visible) GLFW.glfwShowWindow(handle);
+		if (attrib.minimized) glfwIconifyWindow(handle);
+		if (attrib.visible) glfwShowWindow(handle);
 	}
 
-	public void refresh() {
-		GLFW.glfwSwapBuffers(handle);
-		GLFW.glfwPollEvents();
+	void refresh() {
+		glfwSwapBuffers(handle);
+		glfwPollEvents();
 	}
 
-	public void exit() {
-		Callbacks.glfwFreeCallbacks(handle);
-		GLFW.glfwDestroyWindow(handle);
+	void exit() {
+		glfwFreeCallbacks(handle);
+		glfwDestroyWindow(handle);
 	}
 
 	public void setTitle(String title) {
-		attr.title = title;
-		GLFW.glfwSetWindowTitle(handle, title);
+		attrib.title = title;
+		glfwSetWindowTitle(handle, title);
 	}
 
 	public String getTitle() {
-		return attr.title;
+		return attrib.title;
 	}
 
 	public void setIcon(String icon) {
-		attr.icon = icon;
+		attrib.icon = icon;
 		if (!icon.isEmpty()) {
 			try (MemoryStack stack = MemoryStack.stackPush()) {
 				IntBuffer w = stack.mallocInt(1);
 				IntBuffer h = stack.mallocInt(1);
 				IntBuffer c = stack.mallocInt(1);
 				ByteBuffer ico = STBImage.stbi_load(icon, w, h, c, 4);
-				GLFW.glfwSetWindowIcon(handle, GLFWImage.malloc(1, stack).width(w.get(0)).height(h.get(0)).pixels(ico));
+				glfwSetWindowIcon(handle, GLFWImage.malloc(1, stack).width(w.get(0)).height(h.get(0)).pixels(ico));
 				STBImage.stbi_image_free(ico);
 			}
 		}
 	}
 
 	public String getIcon() {
-		return attr.icon;
+		return attrib.icon;
 	}
 
 	public void setPos(int x, int y) {
-		GLFW.glfwSetWindowPos(handle, x, y);
+		glfwSetWindowPos(handle, x, y);
 	}
 
 	public int getX() {
-		return attr.x;
+		return attrib.x;
 	}
 
 	public int getY() {
-		return attr.y;
+		return attrib.y;
 	}
 
 	public void setSize(int width, int height) {
-		GLFW.glfwSetWindowSize(handle, width, height);
+		glfwSetWindowSize(handle, width, height);
 	}
 
 	public int getWidth() {
@@ -193,37 +228,37 @@ public class Window {
 	}
 
 	public void setFullScreen(boolean fullscreen) {
-		attr.fullscreen = fullscreen;
-		long monitor = GLFW.glfwGetPrimaryMonitor();
-		GLFWVidMode vidmode = GLFW.glfwGetVideoMode(monitor);
+		attrib.fullscreen = fullscreen;
+		long monitor = glfwGetPrimaryMonitor();
+		GLFWVidMode vidmode = glfwGetVideoMode(monitor);
 		if (fullscreen) {
-			GLFW.glfwSetWindowMonitor(handle, monitor, 0, 0, vidmode.width(), vidmode.height(), vidmode.refreshRate());
+			glfwSetWindowMonitor(handle, monitor, 0, 0, vidmode.width(), vidmode.height(), vidmode.refreshRate());
 		} else {
-			GLFW.glfwSetWindowMonitor(handle, MemoryUtil.NULL, attr.x, attr.y, attr.width, attr.height, vidmode.refreshRate());
+			glfwSetWindowMonitor(handle, NULL, attrib.x, attrib.y, attrib.width, attrib.height, vidmode.refreshRate());
 		}
-		GLFW.glfwSwapInterval(attr.vsync ? 1 : 0);
-		attr.fullscreen = (GLFW.glfwGetWindowMonitor(handle) == monitor);
+		glfwSwapInterval(attrib.vsync ? 1 : 0);
+		attrib.fullscreen = (glfwGetWindowMonitor(handle) == monitor);
 	}
 
 	public boolean isFullScreen() {
-		return attr.fullscreen;
+		return attrib.fullscreen;
 	}
 
 	public void setVSync(boolean vsync) {
-		attr.vsync = vsync;
-		GLFW.glfwSwapInterval(vsync ? 1 : 0);
+		attrib.vsync = vsync;
+		glfwSwapInterval(vsync ? 1 : 0);
 	}
 
 	public boolean isVSync() {
-		return attr.vsync;
+		return attrib.vsync;
 	}
 
 	public void close() {
-		GLFW.glfwSetWindowShouldClose(handle, true);
+		glfwSetWindowShouldClose(handle, true);
 	}
 
 	public boolean shouldClose() {
-		return GLFW.glfwWindowShouldClose(handle);
+		return glfwWindowShouldClose(handle);
 	}
 
 	public long getHandle() {

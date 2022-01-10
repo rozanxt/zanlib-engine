@@ -1,82 +1,99 @@
 package zan.lib.sfx;
 
+import static org.lwjgl.openal.AL10.AL_BUFFER;
+import static org.lwjgl.openal.AL10.AL_FALSE;
+import static org.lwjgl.openal.AL10.AL_INITIAL;
+import static org.lwjgl.openal.AL10.AL_PLAYING;
+import static org.lwjgl.openal.AL10.AL_SOURCE_STATE;
+import static org.lwjgl.openal.AL10.AL_STOPPED;
+import static org.lwjgl.openal.AL10.AL_TRUE;
+import static org.lwjgl.openal.AL10.alDeleteSources;
+import static org.lwjgl.openal.AL10.alGenSources;
+import static org.lwjgl.openal.AL10.alGetSourcef;
+import static org.lwjgl.openal.AL10.alGetSourcei;
+import static org.lwjgl.openal.AL10.alSource3f;
+import static org.lwjgl.openal.AL10.alSourcePlay;
+import static org.lwjgl.openal.AL10.alSourceRewind;
+import static org.lwjgl.openal.AL10.alSourceStop;
+import static org.lwjgl.openal.AL10.alSourcef;
+import static org.lwjgl.openal.AL10.alSourcei;
+import static org.lwjgl.openal.AL11.AL_SEC_OFFSET;
+
 import org.joml.Vector3f;
-import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.AL11;
 
 public class SoundSource {
 
-	private final int id;
+	private final int index;
 
 	private float offset;
 
 	public SoundSource(SoundData sound) {
-		id = AL10.alGenSources();
+		index = alGenSources();
 		offset = 0.0f;
-		AL10.alSourcei(id, AL10.AL_BUFFER, sound.getID());
+		alSourcei(index, AL_BUFFER, sound.getIndex());
 	}
 
 	public void delete() {
-		AL10.alDeleteSources(id);
+		alDeleteSources(index);
 	}
 
 	public void play() {
-		AL10.alSourcePlay(id);
+		alSourcePlay(index);
 	}
 
 	public void pause() {
-		offset = AL10.alGetSourcef(id, AL11.AL_SEC_OFFSET);
-		AL10.alSourceStop(id);
+		offset = alGetSourcef(index, AL_SEC_OFFSET);
+		alSourceStop(index);
 	}
 
 	public void resume() {
-		AL10.alSourcef(id, AL11.AL_SEC_OFFSET, offset);
-		AL10.alSourcePlay(id);
+		alSourcef(index, AL_SEC_OFFSET, offset);
+		alSourcePlay(index);
 	}
 
 	public void stop() {
 		offset = 0.0f;
-		AL10.alSourceStop(id);
+		alSourceStop(index);
 	}
 
 	public void rewind() {
-		AL10.alSourceRewind(id);
+		alSourceRewind(index);
 	}
 
 	public void setProperty(int property, boolean value) {
-		AL10.alSourcei(id, property, value ? AL10.AL_TRUE : AL10.AL_FALSE);
+		alSourcei(index, property, value ? AL_TRUE : AL_FALSE);
 	}
 
 	public void setProperty(int property, int value) {
-		AL10.alSourcei(id, property, value);
+		alSourcei(index, property, value);
 	}
 
 	public void setProperty(int property, float value) {
-		AL10.alSourcef(id, property, value);
+		alSourcef(index, property, value);
 	}
 
 	public void setProperty(int property, Vector3f value) {
-		AL10.alSource3f(id, property, value.x, value.y, value.z);
+		alSource3f(index, property, value.x, value.y, value.z);
 	}
 
 	public boolean isInitial() {
-		return AL10.alGetSourcei(id, AL10.AL_SOURCE_STATE) == AL10.AL_INITIAL;
+		return alGetSourcei(index, AL_SOURCE_STATE) == AL_INITIAL;
 	}
 
 	public boolean isPlaying() {
-		return AL10.alGetSourcei(id, AL10.AL_SOURCE_STATE) == AL10.AL_PLAYING;
+		return alGetSourcei(index, AL_SOURCE_STATE) == AL_PLAYING;
 	}
 
 	public boolean isPaused() {
-		return ((offset > 0.0f) && isStopped());
+		return (offset > 0.0f && isStopped());
 	}
 
 	public boolean isStopped() {
-		return AL10.alGetSourcei(id, AL10.AL_SOURCE_STATE) == AL10.AL_STOPPED;
+		return alGetSourcei(index, AL_SOURCE_STATE) == AL_STOPPED;
 	}
 
 	public int getID() {
-		return id;
+		return index;
 	}
 
 }
