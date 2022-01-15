@@ -1,4 +1,4 @@
-package zan.lib.gfx;
+package zan.lib.gfx.shader;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;

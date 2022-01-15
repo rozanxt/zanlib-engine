@@ -1,4 +1,4 @@
-package zan.lib.gfx;
+package zan.lib.gfx.text;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.lwjgl.system.MemoryUtil;
 
+import zan.lib.gfx.texture.Texture;
 import zan.lib.utl.Utility;
 
 public class TextFont {
@@ -32,7 +33,7 @@ public class TextFont {
 
 	private final Map<Character, CharInfo> fontInfo;
 
-	private final Texture texture;
+	private final Texture fontTexture;
 
 	public TextFont(Font font, String charset) {
 		CharsetEncoder ce = Charset.forName(charset).newEncoder();
@@ -54,29 +55,29 @@ public class TextFont {
 		if (font.isItalic()) padding = 1;
 
 		BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = bi.createGraphics();
-		g2d.setFont(font);
-		FontMetrics fm = g2d.getFontMetrics();
+		Graphics2D gf = bi.createGraphics();
+		gf.setFont(font);
+		FontMetrics fm = gf.getFontMetrics();
 		for (char ch : metricsChars.toCharArray()) {
 			CharInfo ci = new CharInfo(width, fm.charWidth(ch) + padding);
 			fontInfo.put(ch, ci);
 			width += fm.charWidth(ch) + fm.charWidth(' ');
 			height = Math.max(height, fm.getHeight());
 		}
-		g2d.dispose();
+		gf.dispose();
 
 		bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		g2d = bi.createGraphics();
-		g2d.setFont(font);
-		fm = g2d.getFontMetrics();
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g2d.setColor(Color.WHITE);
-		g2d.drawString(textureChars, 0, fm.getAscent());
-		g2d.dispose();
+		gf = bi.createGraphics();
+		gf.setFont(font);
+		fm = gf.getFontMetrics();
+		gf.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		gf.setColor(Color.WHITE);
+		gf.drawString(textureChars, 0, fm.getAscent());
+		gf.dispose();
 
-		ByteBuffer buffer = Utility.BufferedImageToByteBuffer(bi);
-		texture = new Texture(buffer, bi.getWidth(), bi.getHeight());
-		MemoryUtil.memFree(buffer);
+		ByteBuffer data = Utility.BufferedImageToByteBuffer(bi);
+		fontTexture = new Texture(data, bi.getWidth(), bi.getHeight());
+		MemoryUtil.memFree(data);
 	}
 
 	public TextFont(Font font) {
@@ -84,7 +85,7 @@ public class TextFont {
 	}
 
 	public void delete() {
-		texture.delete();
+		fontTexture.delete();
 	}
 
 	public CharInfo getCharInfo(char ch) {
@@ -92,7 +93,7 @@ public class TextFont {
 	}
 
 	public Texture getTexture() {
-		return texture;
+		return fontTexture;
 	}
 
 }

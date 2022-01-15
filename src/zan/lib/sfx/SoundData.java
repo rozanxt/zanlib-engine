@@ -5,11 +5,11 @@ import static org.lwjgl.openal.AL10.AL_FORMAT_STEREO16;
 import static org.lwjgl.openal.AL10.alBufferData;
 import static org.lwjgl.openal.AL10.alDeleteBuffers;
 import static org.lwjgl.openal.AL10.alGenBuffers;
+import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_filename;
 
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.lwjgl.stb.STBVorbis;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.libc.LibCStdlib;
 
@@ -32,7 +32,7 @@ public class SoundData {
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer c = stack.mallocInt(1);
 			IntBuffer s = stack.mallocInt(1);
-			ShortBuffer data = STBVorbis.stb_vorbis_decode_filename(path, c, s);
+			ShortBuffer data = stb_vorbis_decode_filename(path, c, s);
 			int channels = c.get();
 			int sampling = s.get();
 			int format = -1;

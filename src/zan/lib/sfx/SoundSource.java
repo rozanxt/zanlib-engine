@@ -60,19 +60,19 @@ public class SoundSource {
 		alSourceRewind(index);
 	}
 
-	public void setProperty(int property, boolean value) {
+	public void setSource(int property, boolean value) {
 		alSourcei(index, property, value ? AL_TRUE : AL_FALSE);
 	}
 
-	public void setProperty(int property, int value) {
+	public void setSource(int property, int value) {
 		alSourcei(index, property, value);
 	}
 
-	public void setProperty(int property, float value) {
+	public void setSource(int property, float value) {
 		alSourcef(index, property, value);
 	}
 
-	public void setProperty(int property, Vector3f value) {
+	public void setSource(int property, Vector3f value) {
 		alSource3f(index, property, value.x, value.y, value.z);
 	}
 
@@ -85,14 +85,14 @@ public class SoundSource {
 	}
 
 	public boolean isPaused() {
-		return (offset > 0.0f && isStopped());
+		return offset > 0.0f && isStopped();
 	}
 
 	public boolean isStopped() {
 		return alGetSourcei(index, AL_SOURCE_STATE) == AL_STOPPED;
 	}
 
-	public int getID() {
+	public int getIndex() {
 		return index;
 	}
 

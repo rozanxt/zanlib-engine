@@ -1,20 +1,18 @@
-package zan.lib.sbx;
+package zan.lib.sbx.scene;
 
 import static java.awt.Font.PLAIN;
 import static java.awt.Font.SANS_SERIF;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F1;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F12;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F2;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F3;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F4;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F5;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_TAB;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
@@ -30,6 +28,8 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.Font;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -38,35 +38,37 @@ import zan.lib.app.Engine;
 import zan.lib.app.Input;
 import zan.lib.app.Scene;
 import zan.lib.app.Window;
-import zan.lib.gfx.Mesh;
-import zan.lib.gfx.OBJLoader;
-import zan.lib.gfx.Shader;
-import zan.lib.gfx.SpriteItem;
-import zan.lib.gfx.TextFont;
-import zan.lib.gfx.TextItem;
-import zan.lib.gfx.Texture;
+import zan.lib.gfx.camera.Camera;
+import zan.lib.gfx.camera.ScreenCamera;
+import zan.lib.gfx.mesh.Mesh;
+import zan.lib.gfx.model.ModelLoader;
+import zan.lib.gfx.shader.Shader;
+import zan.lib.gfx.sprite.SpriteMesh;
+import zan.lib.gfx.text.TextFont;
+import zan.lib.gfx.text.TextMesh;
+import zan.lib.gfx.texture.Texture;
+import zan.lib.sbx.camera.DemonstrationCamera;
 import zan.lib.sfx.SoundData;
 import zan.lib.sfx.SoundSource;
 import zan.lib.sfx.SoundSystem;
 
-public class Sandbox implements Scene {
+public class Demonstration implements Scene {
 
 	private Engine engine;
 
-	private Shader defShader;
-	private Shader stdShader;
+	private Map<String, Shader> shaders;
+
+	private Camera camera;
+	private Camera screen;
 
 	private Texture texture;
 	private Mesh cube;
 	private Shader cubeShader;
 	private Vector4f cubeUniformColor;
 	private boolean cubeEnableTexture;
-	private float cubeRotationX;
-	private float cubeRotationY;
-	private float cubeTranslationZ;
 
 	private Texture sheet;
-	private SpriteItem sprite;
+	private SpriteMesh sprite;
 	private float spriteX;
 	private float spriteCounter;
 	private int spriteFrame;
@@ -75,41 +77,56 @@ public class Sandbox implements Scene {
 	private String content;
 
 	private TextFont font;
-	private TextItem text;
-	private TextItem help;
+	private TextMesh text;
+	private TextMesh help;
+	private TextMesh ufps;
+
 	private boolean showHelp;
 
 	private SoundData sound;
 	private SoundSource source;
 
-	public Sandbox(Engine engine) {
+	public Demonstration(Engine engine) {
 		this.engine = engine;
 	}
 
 	@Override
 	public void init() {
-		defShader = Shader.loadFromFile("res/shd/defshader.vs", "res/shd/defshader.fs");
-		stdShader = Shader.loadFromFile("res/shd/stdshader.vs", "res/shd/stdshader.fs");
+		Window window = engine.getWindow();
+		Input input = engine.getInput();
 
-		texture = Texture.loadFromFile("res/img/grassblock.png");
-		cube = OBJLoader.loadFromFile("res/obj/cube.obj");
-		cubeShader = stdShader;
+		shaders = new HashMap<>();
+		shaders.put("default", Shader.loadFromFile("res/shd/default.vert", "res/shd/default.frag"));
+		shaders.put("standard", Shader.loadFromFile("res/shd/standard.vert", "res/shd/standard.frag"));
+		shaders.put("text", Shader.loadFromFile("res/shd/text.vert", "res/shd/text.frag"));
+
+		camera = new DemonstrationCamera(window, input);
+		screen = new ScreenCamera(window);
+
+		texture = Texture.loadFromFile("res/img/block.png");
+		cube = ModelLoader.loadFromFile("res/obj/block.obj");
+		cubeShader = shaders.get("standard");
 		cubeUniformColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 		cubeEnableTexture = true;
-		cubeRotationX = 0.0f;
-		cubeRotationY = 0.0f;
-		cubeTranslationZ = -5.0f;
 
 		sheet = Texture.loadFromFile("res/img/animation.png");
-		sprite = new SpriteItem(sheet, 12, 1);
-		spriteX = -65.0f;
+		sprite = new SpriteMesh(sheet, 12, 1);
+		spriteX = 0.0f;
 		spriteFrame = 4;
 		spriteFlip = false;
 
 		content = "ZanLibEngine";
+
 		font = new TextFont(new Font(SANS_SERIF, PLAIN, 20));
-		text = new TextItem(content, font);
-		help = new TextItem("F1: Help", font);
+		text = new TextMesh(font);
+		text.setText(content);
+		text.setMaxWidth(450.0f);
+		text.build();
+		help = new TextMesh(font);
+		help.setText("F1: Help");
+		help.build();
+		ufps = new TextMesh(font);
+
 		showHelp = false;
 
 		SoundSystem.init();
@@ -119,8 +136,7 @@ public class Sandbox implements Scene {
 
 	@Override
 	public void exit() {
-		defShader.delete();
-		stdShader.delete();
+		for (Shader shader : shaders.values()) shader.delete();
 		texture.delete();
 		cube.delete();
 		sheet.delete();
@@ -128,6 +144,7 @@ public class Sandbox implements Scene {
 		font.delete();
 		text.delete();
 		help.delete();
+		ufps.delete();
 		sound.delete();
 		source.delete();
 		SoundSystem.exit();
@@ -138,9 +155,7 @@ public class Sandbox implements Scene {
 		Input input = engine.getInput();
 		Window window = engine.getWindow();
 
-		if (input.isKeyReleased(GLFW_KEY_ESCAPE)) {
-			window.close();
-		} else if (input.isKeyReleased(GLFW_KEY_F1)) {
+		if (input.isKeyReleased(GLFW_KEY_F1)) {
 			if (showHelp) {
 				help.setText("F1: Help");
 			} else {
@@ -150,17 +165,18 @@ public class Sandbox implements Scene {
 					"F4: Toggle music\n" +
 					"F5: Rewind music\n" +
 					"F11: Toggle fullscreen\n" +
+					"F12: Exit application\n" +
 					"Left mouse button drag: Rotate cube\n" +
 					"Mouse scroll: Zoom in / out\n" +
 					"Left / right arrow key: Move sprite\n");
 			}
 			showHelp = !showHelp;
-			help.update();
+			help.build();
 		} else if (input.isKeyReleased(GLFW_KEY_F2)) {
-			if (cubeShader == stdShader) {
-				cubeShader = defShader;
+			if (cubeShader == shaders.get("standard")) {
+				cubeShader = shaders.get("default");
 			} else {
-				cubeShader = stdShader;
+				cubeShader = shaders.get("standard");
 			}
 		} else if (input.isKeyReleased(GLFW_KEY_F3)) {
 			cubeEnableTexture = !cubeEnableTexture;
@@ -181,6 +197,8 @@ public class Sandbox implements Scene {
 			source.stop();
 		} else if (input.isKeyReleased(GLFW_KEY_F11)) {
 			window.setFullScreen(!window.isFullScreen());
+		} else if (input.isKeyReleased(GLFW_KEY_F12)) {
+			window.close();
 		}
 
 		if (input.isKeyDown(GLFW_KEY_LEFT)) {
@@ -206,33 +224,37 @@ public class Sandbox implements Scene {
 		if (input.isKeyPressed(GLFW_KEY_ENTER) || input.isKeyRepeated(GLFW_KEY_ENTER)) {
 			content += "\n";
 		}
-		if (text.getOffset() < 450.0f) {
-			if (input.isKeyPressed(GLFW_KEY_TAB) || input.isKeyRepeated(GLFW_KEY_TAB)) {
-				content += "    ";
-			}
-			while (input.hasCharEvent()) {
-				content += input.getCharEvent();
+		while (input.hasCharEvent()) {
+			char ch = input.getCharEvent();
+			if (text.getOffset() + text.getFont().getCharInfo(ch).w < text.getMaxWidth()) {
+				content += ch;
 			}
 		}
 		if (text.getText() != content) {
 			text.setText(content);
-			text.update();
+			text.build();
 		}
 
-		if (input.isMouseDown(GLFW_MOUSE_BUTTON_1)) {
-			cubeRotationX += 0.5f * input.getMouseDeltaY();
-			cubeRotationY += 0.5f * input.getMouseDeltaX();
-		}
-		cubeTranslationZ += 0.5f * input.getMouseScrollY();
+		ufps.setText(String.format("FPS: %d\nUPS: %d", engine.getCurrentFPS(), engine.getCurrentUPS()));
+		ufps.build();
+
+		camera.update(theta);
+		screen.update(theta);
 	}
 
 	@Override
 	public void render(float theta) {
-		Window window = engine.getWindow();
-		float width = window.getWidth();
-		float height = window.getHeight();
+		Shader shader;
 
-		glViewport(0, 0, (int) width, (int) height);
+		Window window = engine.getWindow();
+
+		int width = window.getWidth();
+		int height = window.getHeight();
+
+		glViewport(0, 0, width, height);
+
+		camera.capture(theta);
+		screen.capture(theta);
 
 		glClearColor(0.0f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -240,22 +262,19 @@ public class Sandbox implements Scene {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 
-		cubeShader.bind();
-		cubeShader.setUniform("projectionMatrix", new Matrix4f()
-			.setPerspective((float) Math.toRadians(60.0f), width / height, 0.01f, 1000.0f));
-		cubeShader.setUniform("modelViewMatrix", new Matrix4f()
-			.translate(0.0f, 0.0f, cubeTranslationZ)
-			.rotate((float) Math.toRadians(cubeRotationX), 1.0f, 0.0f, 0.0f)
-			.rotate((float) Math.toRadians(cubeRotationY), 0.0f, 1.0f, 0.0f));
-		cubeShader.setUniform("uniformColor", cubeUniformColor);
-		cubeShader.setUniform("enableTexture", cubeEnableTexture);
-		cubeShader.setUniform("textureUnit", 0);
+		shader = cubeShader;
+		shader.bind();
+		shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
+		shader.setUniform("modelViewMatrix", camera.getViewMatrix());
+		shader.setUniform("uniformColor", cubeUniformColor);
+		shader.setUniform("enableTexture", cubeEnableTexture);
+		shader.setUniform("textureUnit", 0);
 		texture.bind();
 		cube.bind();
 		cube.draw();
 		cube.unbind();
 		texture.unbind();
-		cubeShader.unbind();
+		shader.unbind();
 
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
@@ -263,43 +282,58 @@ public class Sandbox implements Scene {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		defShader.bind();
-		defShader.setUniform("projectionMatrix", new Matrix4f()
-			.setOrtho(-width / 2.0f, width / 2.0f, -height / 2.0f, height / 2.0f, -1.0f, 1.0f));
+		shader = shaders.get("default");
+		shader.bind();
+		shader.setUniform("projectionMatrix", screen.getProjectionMatrix());
 		if (spriteFlip) {
-			defShader.setUniform("modelViewMatrix", new Matrix4f()
-				.translate(spriteX, -height / 2.0f, 0.0f)
+			shader.setUniform("modelViewMatrix", new Matrix4f()
+				.translate(spriteX, 0.0f, 0.0f)
 				.translate(sprite.getWidth() / 2.0f, 0.0f, 0.0f)
 				.reflect(1.0f, 0.0f, 0.0f, 0.0f)
 				.translate(-sprite.getWidth() / 2.0f, 0.0f, 0.0f));
 		} else {
-			defShader.setUniform("modelViewMatrix", new Matrix4f()
-				.translate(spriteX, -height / 2.0f, 0.0f));
+			shader.setUniform("modelViewMatrix", new Matrix4f()
+				.translate(spriteX, 0.0f, 0.0f));
 		}
-		defShader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-		defShader.setUniform("enableTexture", true);
-		defShader.setUniform("textureUnit", 0);
-		sprite.render(spriteFrame);
-		defShader.unbind();
+		shader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+		shader.setUniform("enableTexture", true);
+		shader.setUniform("textureUnit", 0);
+		sprite.bind();
+		sprite.drawFrame(spriteFrame);
+		sprite.unbind();
+		shader.unbind();
 
-		defShader.bind();
-		defShader.setUniform("projectionMatrix", new Matrix4f()
-			.setOrtho(-width / 2.0f, width / 2.0f, -height / 2.0f, height / 2.0f, -1.0f, 1.0f));
-		defShader.setUniform("modelViewMatrix", new Matrix4f()
-			.translate((int) -(text.getWidth() / 2.0f), (int) (height / 2.0f - 30.0f), 0.0f));
-		defShader.setUniform("uniformColor", new Vector4f(0.0f, 0.5f, 0.8f, 1.0f));
-		defShader.setUniform("enableTexture", true);
-		defShader.setUniform("textureUnit", 0);
-		text.render();
-		defShader.setUniform("modelViewMatrix", new Matrix4f()
-			.translate(-width / 2.0f + 10.0f, (int) (height / 2.0f - 30.0f), 0.0f));
+		shader = shaders.get("text");
+		shader.bind();
+
+		shader.setUniform("projectionMatrix", screen.getProjectionMatrix());
+		shader.setUniform("modelViewMatrix", new Matrix4f()
+			.translate((int) (width / 2 - text.getWidth() / 2), height - 30, 0));
+		shader.setUniform("uniformColor", new Vector4f(0.0f, 0.5f, 0.8f, 1.0f));
+		shader.setUniform("textureUnit", 0);
+		text.bind();
+		text.draw();
+		text.unbind();
+
 		if (showHelp) {
-			defShader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+			shader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 		} else {
-			defShader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 0.5f));
+			shader.setUniform("uniformColor", new Vector4f(1.0f, 1.0f, 1.0f, 0.5f));
 		}
-		help.render();
-		defShader.unbind();
+
+		shader.setUniform("modelViewMatrix", new Matrix4f()
+			.translate(10, height - 30, 0));
+		help.bind();
+		help.draw();
+		help.unbind();
+
+		shader.setUniform("modelViewMatrix", new Matrix4f()
+			.translate((int) (width - ufps.getWidth() - 10), height - 30, 0));
+		ufps.bind();
+		ufps.draw();
+		ufps.unbind();
+
+		shader.unbind();
 
 		glDisable(GL_BLEND);
 	}
@@ -307,11 +341,11 @@ public class Sandbox implements Scene {
 	public static void main(String[] args) {
 		Engine engine = new Engine(60, 50);
 		Window.Attributes attrib = new Window.Attributes(640, 480);
-		attrib.title = "Sandbox";
+		attrib.title = "Demonstration";
 		attrib.icon = "res/ico/icon.png";
 		Window window = new Window(attrib);
 		Input input = new Input(window);
-		Scene scene = new Sandbox(engine);
+		Scene scene = new Demonstration(engine);
 		engine.setWindow(window);
 		engine.setInput(input);
 		engine.setScene(scene);

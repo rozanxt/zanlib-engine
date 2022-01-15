@@ -35,6 +35,8 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.nio.ByteBuffer;
@@ -43,7 +45,6 @@ import java.nio.IntBuffer;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
 public class Window {
@@ -70,7 +71,7 @@ public class Window {
 		public boolean minimized = false;
 		public boolean visible = true;
 
-		public int samples = 0;
+		public int msaa = 0;
 
 		public Attributes(int width, int height) {
 			this.width = width;
@@ -107,7 +108,7 @@ public class Window {
 		glfwWindowHint(GLFW_AUTO_ICONIFY, attrib.autoiconify ? GL_TRUE : GL_FALSE);
 		glfwWindowHint(GLFW_FLOATING, attrib.floating ? GL_TRUE : GL_FALSE);
 		glfwWindowHint(GLFW_MAXIMIZED, attrib.maximized ? GL_TRUE : GL_FALSE);
-		glfwWindowHint(GLFW_SAMPLES, attrib.samples);
+		glfwWindowHint(GLFW_SAMPLES, attrib.msaa);
 	}
 
 	private void initWindow() {
@@ -192,9 +193,9 @@ public class Window {
 				IntBuffer w = stack.mallocInt(1);
 				IntBuffer h = stack.mallocInt(1);
 				IntBuffer c = stack.mallocInt(1);
-				ByteBuffer ico = STBImage.stbi_load(icon, w, h, c, 4);
+				ByteBuffer ico = stbi_load(icon, w, h, c, 4);
 				glfwSetWindowIcon(handle, GLFWImage.malloc(1, stack).width(w.get(0)).height(h.get(0)).pixels(ico));
-				STBImage.stbi_image_free(ico);
+				stbi_image_free(ico);
 			}
 		}
 	}

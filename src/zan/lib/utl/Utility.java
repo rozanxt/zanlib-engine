@@ -16,6 +16,10 @@ public final class Utility {
 
 	}
 
+	public static float lerp(float a, float b, float theta) {
+		return a + theta * (b - a);
+	}
+
 	public static int[] IntegerListToArray(List<Integer> list) {
 		int[] array = new int[list.size()];
 		for (int i = 0; i < list.size(); i++) {

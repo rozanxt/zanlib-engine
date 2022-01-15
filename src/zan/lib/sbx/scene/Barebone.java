@@ -1,4 +1,4 @@
-package zan.lib.sbx;
+package zan.lib.sbx.scene;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
