@@ -152,8 +152,8 @@ public class Demonstration implements Scene {
 
 	@Override
 	public void update(float theta) {
-		Input input = engine.getInput();
 		Window window = engine.getWindow();
+		Input input = engine.getInput();
 
 		if (input.isKeyReleased(GLFW_KEY_F1)) {
 			if (showHelp) {
