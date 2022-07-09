@@ -2,7 +2,6 @@ package zan.lib.gfx.shader;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
-import static org.lwjgl.opengl.GL20.GL_ACTIVE_UNIFORMS;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
@@ -14,11 +13,11 @@ import static org.lwjgl.opengl.GL20.glCreateShader;
 import static org.lwjgl.opengl.GL20.glDeleteProgram;
 import static org.lwjgl.opengl.GL20.glDeleteShader;
 import static org.lwjgl.opengl.GL20.glDetachShader;
-import static org.lwjgl.opengl.GL20.glGetActiveUniform;
 import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
 import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 import static org.lwjgl.opengl.GL20.glGetShaderi;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniform1f;
@@ -33,9 +32,6 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.joml.Matrix4fc;
 import org.joml.Vector2fc;
@@ -52,14 +48,9 @@ public class Shader {
 
 	private final int program;
 
-	private final Map<String, Integer> uniforms;
-
 	public Shader(String vertexSource, String fragmentSource) {
 		program = glCreateProgram();
 		createProgram(vertexSource, fragmentSource);
-
-		uniforms = new HashMap<>();
-		assignUniforms();
 	}
 
 	public static Shader loadFromFile(String vertexPath, String fragmentPath) {
@@ -91,17 +82,6 @@ public class Shader {
 	private void deleteShader(int shader) {
 		glDetachShader(program, shader);
 		glDeleteShader(shader);
-	}
-
-	private void assignUniforms() {
-		int count = glGetProgrami(program, GL_ACTIVE_UNIFORMS);
-		try (MemoryStack stack = MemoryStack.stackPush()) {
-			IntBuffer size = stack.mallocInt(1);
-			IntBuffer type = stack.mallocInt(1);
-			for (int i = 0; i < count; i++) {
-				uniforms.put(glGetActiveUniform(program, i, size, type), i);
-			}
-		}
 	}
 
 	public void delete() {
@@ -161,7 +141,7 @@ public class Shader {
 	}
 
 	public int getUniform(String uniform) {
-		return uniforms.get(uniform);
+		return glGetUniformLocation(program, uniform);
 	}
 
 }
