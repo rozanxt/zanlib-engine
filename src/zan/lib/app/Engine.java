@@ -26,13 +26,8 @@ public class Engine implements Runnable {
 	}
 
 	public void start() {
-		Thread thread = new Thread(this, "engine");
-		String os = System.getProperty("os.name");
-		if (os.contains("Mac")) {
-			thread.run();
-		} else {
-			thread.start();
-		}
+		Thread thread = new Thread(this);
+		thread.start();
 	}
 
 	@Override
@@ -44,37 +39,43 @@ public class Engine implements Runnable {
 
 	private void init() {
 		GLFWErrorCallback.createPrint(System.err).set();
-		if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW!");
-		if (window != null) window.init();
-		if (input != null) input.init();
-		if (scene != null) scene.init();
+		if (!glfwInit()) {
+			throw new IllegalStateException("Unable to initialize GLFW!");
+		}
+
+		window.init();
+		input.init();
+		scene.init();
 	}
 
 	private void loop() {
-		long lastTime = System.nanoTime();
+		long prevTime = System.nanoTime();
+		long nextTime = prevTime;
 		long updateTime = 0L;
-		long nextFrame = lastTime + NANOS_PER_SECOND / targetFPS;
+
 		long counter = 0L;
 		int countFPS = 0;
 		int countUPS = 0;
 
-		while (window != null && !window.shouldClose()) {
+		while (!window.shouldClose()) {
+			long currentTime = System.nanoTime();
+			long elapsedTime = currentTime - prevTime;
+
 			long deltaFPS = NANOS_PER_SECOND / targetFPS;
 			long deltaUPS = NANOS_PER_SECOND / targetUPS;
-			long currentTime = System.nanoTime();
-			long elapsedTime = currentTime - lastTime;
-			lastTime = currentTime;
+
+			prevTime = currentTime;
+			nextTime += deltaFPS;
 			updateTime += elapsedTime;
-			nextFrame += deltaFPS;
 
 			while (updateTime >= deltaUPS) {
-				if (scene != null) scene.update((float) updateTime / (float) deltaUPS);
-				if (input != null) input.clear();
+				scene.update(1.0f / targetUPS);
+				input.clear();
 				updateTime -= deltaUPS;
 				countUPS++;
 			}
 
-			if (scene != null) scene.render((float) updateTime / (float) deltaUPS);
+			scene.render((float) updateTime / (float) deltaUPS);
 			window.refresh();
 			countFPS++;
 
@@ -88,7 +89,7 @@ public class Engine implements Runnable {
 			}
 
 			if (!window.isVSync()) {
-				while (System.nanoTime() < nextFrame) {
+				while (System.nanoTime() < nextTime) {
 					try {
 						Thread.sleep(1);
 					} catch (InterruptedException e) {
@@ -100,9 +101,10 @@ public class Engine implements Runnable {
 	}
 
 	private void exit() {
-		if (scene != null) scene.exit();
-		if (input != null) input.exit();
-		if (window != null) window.exit();
+		scene.exit();
+		input.exit();
+		window.exit();
+
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
 	}

@@ -51,7 +51,7 @@ public class WorldCamera implements Camera {
 	}
 
 	@Override
-	public void update(float theta) {
+	public void update(float delta) {
 		prev.set(next);
 	}
 

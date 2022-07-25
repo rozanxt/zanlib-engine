@@ -29,7 +29,7 @@ public class SpriteMesh extends IndexMesh {
 	public static class Vertex {
 
 		private static final int SLOTS = 4;
-		private static final int BYTES = SLOTS*Float.BYTES;
+		private static final int BYTES = SLOTS * Float.BYTES;
 
 		private final float x;
 		private final float y;
@@ -99,7 +99,7 @@ public class SpriteMesh extends IndexMesh {
 
 		glBindVertexArray(vao);
 
-		FloatBuffer vertexData = MemoryUtil.memAllocFloat(vertexCount*Vertex.SLOTS);
+		FloatBuffer vertexData = MemoryUtil.memAllocFloat(vertexCount * Vertex.SLOTS);
 		for (Vertex vertex : vertices) {
 			vertexData.put(vertex.x);
 			vertexData.put(vertex.y);
@@ -113,8 +113,8 @@ public class SpriteMesh extends IndexMesh {
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 
-		glVertexAttribPointer(0, 2, GL_FLOAT, false, Vertex.BYTES, 0*Float.BYTES);
-		glVertexAttribPointer(1, 2, GL_FLOAT, false, Vertex.BYTES, 2*Float.BYTES);
+		glVertexAttribPointer(0, 2, GL_FLOAT, false, Vertex.BYTES, 0 * Float.BYTES);
+		glVertexAttribPointer(1, 2, GL_FLOAT, false, Vertex.BYTES, 2 * Float.BYTES);
 
 		IntBuffer elementData = MemoryUtil.memAllocInt(elementCount);
 		for (Integer element : elements) {

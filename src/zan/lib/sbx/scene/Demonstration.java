@@ -151,7 +151,7 @@ public class Demonstration implements Scene {
 	}
 
 	@Override
-	public void update(float theta) {
+	public void update(float delta) {
 		Window window = engine.getWindow();
 		Input input = engine.getInput();
 
@@ -238,8 +238,8 @@ public class Demonstration implements Scene {
 		ufps.setText(String.format("FPS: %d\nUPS: %d", engine.getCurrentFPS(), engine.getCurrentUPS()));
 		ufps.build();
 
-		camera.update(theta);
-		screen.update(theta);
+		camera.update(delta);
+		screen.update(delta);
 	}
 
 	@Override

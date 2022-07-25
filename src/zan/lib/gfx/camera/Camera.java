@@ -4,7 +4,7 @@ import org.joml.Matrix4fc;
 
 public interface Camera {
 
-	void update(float theta);
+	void update(float delta);
 
 	void capture(float theta);
 

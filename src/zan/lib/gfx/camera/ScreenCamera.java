@@ -22,7 +22,7 @@ public class ScreenCamera implements Camera {
 	}
 
 	@Override
-	public void update(float theta) {
+	public void update(float delta) {
 
 	}
 

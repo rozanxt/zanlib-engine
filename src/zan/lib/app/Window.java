@@ -124,6 +124,7 @@ public class Window {
 			height = attrib.height;
 			handle = glfwCreateWindow(width, height, attrib.title, NULL, NULL);
 		}
+
 		if (handle == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window!");
 		}
@@ -144,12 +145,14 @@ public class Window {
 				attrib.y = y;
 			}
 		});
+
 		glfwSetWindowSizeCallback(handle, (window, width, height) -> {
 			if (!attrib.fullscreen) {
 				attrib.width = width;
 				attrib.height = height;
 			}
 		});
+
 		glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
 			this.width = width;
 			this.height = height;
@@ -163,8 +166,12 @@ public class Window {
 	}
 
 	private void initFinish() {
-		if (attrib.minimized) glfwIconifyWindow(handle);
-		if (attrib.visible) glfwShowWindow(handle);
+		if (attrib.minimized) {
+			glfwIconifyWindow(handle);
+		}
+		if (attrib.visible) {
+			glfwShowWindow(handle);
+		}
 	}
 
 	void refresh() {
@@ -230,14 +237,18 @@ public class Window {
 
 	public void setFullScreen(boolean fullscreen) {
 		attrib.fullscreen = fullscreen;
+
 		long monitor = glfwGetPrimaryMonitor();
 		GLFWVidMode vidmode = glfwGetVideoMode(monitor);
+
 		if (fullscreen) {
 			glfwSetWindowMonitor(handle, monitor, 0, 0, vidmode.width(), vidmode.height(), vidmode.refreshRate());
 		} else {
 			glfwSetWindowMonitor(handle, NULL, attrib.x, attrib.y, attrib.width, attrib.height, vidmode.refreshRate());
 		}
+
 		glfwSwapInterval(attrib.vsync ? 1 : 0);
+
 		attrib.fullscreen = (glfwGetWindowMonitor(handle) == monitor);
 	}
 

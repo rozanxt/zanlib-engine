@@ -28,17 +28,6 @@ public final class Utility {
 		return prev + theta * (next - prev);
 	}
 
-	public static float slerp(float prev, float next, float period, float theta) {
-		if (Math.abs(next - prev) > period / 2.0f) {
-			if (next > prev) {
-				prev += period;
-			} else {
-				next += period;
-			}
-		}
-		return lerp(prev, next, theta) % period;
-	}
-
 	public static Vector2f lerp(Vector2fc prev, Vector2fc next, float theta) {
 		return new Vector2f(prev).lerp(next, theta);
 	}
@@ -49,6 +38,17 @@ public final class Utility {
 
 	public static Vector4f lerp(Vector4fc prev, Vector4fc next, float theta) {
 		return new Vector4f(prev).lerp(next, theta);
+	}
+
+	public static float slerp(float prev, float next, float period, float theta) {
+		if (Math.abs(next - prev) > period / 2.0f) {
+			if (next > prev) {
+				prev += period;
+			} else {
+				next += period;
+			}
+		}
+		return lerp(prev, next, theta) % period;
 	}
 
 	public static Vector2f slerp(Vector2fc prev, Vector2fc next, float theta) {

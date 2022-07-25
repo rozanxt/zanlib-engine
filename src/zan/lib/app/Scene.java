@@ -6,7 +6,7 @@ public interface Scene {
 
 	void exit();
 
-	void update(float theta);
+	void update(float delta);
 
 	void render(float theta);
 

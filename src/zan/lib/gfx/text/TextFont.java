@@ -31,9 +31,9 @@ public class TextFont {
 
 	}
 
-	private final Map<Character, CharInfo> fontInfo;
+	private final Map<Character, CharInfo> info;
 
-	private final Texture fontTexture;
+	private final Texture texture;
 
 	public TextFont(Font font, String charset) {
 		CharsetEncoder ce = Charset.forName(charset).newEncoder();
@@ -48,7 +48,7 @@ public class TextFont {
 		String metricsChars = mc.toString();
 		String textureChars = tc.toString();
 
-		fontInfo = new HashMap<>();
+		info = new HashMap<>();
 		int width = 0;
 		int height = 0;
 		int padding = 0;
@@ -60,7 +60,7 @@ public class TextFont {
 		FontMetrics fm = gf.getFontMetrics();
 		for (char ch : metricsChars.toCharArray()) {
 			CharInfo ci = new CharInfo(width, fm.charWidth(ch) + padding);
-			fontInfo.put(ch, ci);
+			info.put(ch, ci);
 			width += fm.charWidth(ch) + fm.charWidth(' ');
 			height = Math.max(height, fm.getHeight());
 		}
@@ -76,7 +76,7 @@ public class TextFont {
 		gf.dispose();
 
 		ByteBuffer data = Utility.BufferedImageToByteBuffer(bi);
-		fontTexture = new Texture(data, bi.getWidth(), bi.getHeight());
+		texture = new Texture(data, bi.getWidth(), bi.getHeight());
 		MemoryUtil.memFree(data);
 	}
 
@@ -85,15 +85,15 @@ public class TextFont {
 	}
 
 	public void delete() {
-		fontTexture.delete();
+		texture.delete();
 	}
 
 	public CharInfo getCharInfo(char ch) {
-		return fontInfo.get(ch);
+		return info.get(ch);
 	}
 
 	public Texture getTexture() {
-		return fontTexture;
+		return texture;
 	}
 
 }

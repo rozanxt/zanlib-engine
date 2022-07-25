@@ -1,7 +1,7 @@
 package zan.lib.sbx.scene;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F12;
 
 import zan.lib.app.Engine;
 import zan.lib.app.Input;
@@ -27,14 +27,14 @@ public class Barebone implements Scene {
 	}
 
 	@Override
-	public void update(float theta) {
+	public void update(float delta) {
 		Window window = engine.getWindow();
 		Input input = engine.getInput();
 
-		if (input.isKeyReleased(GLFW_KEY_ESCAPE)) {
-			window.close();
-		} else if (input.isKeyReleased(GLFW_KEY_F11)) {
+		if (input.isKeyReleased(GLFW_KEY_F11)) {
 			window.setFullScreen(!window.isFullScreen());
+		} else if (input.isKeyReleased(GLFW_KEY_F12)) {
+			window.close();
 		}
 	}
 

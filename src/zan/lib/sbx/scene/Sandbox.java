@@ -83,7 +83,7 @@ public class Sandbox implements Scene {
 	}
 
 	@Override
-	public void update(float theta) {
+	public void update(float delta) {
 		Window window = engine.getWindow();
 		Input input = engine.getInput();
 
@@ -93,8 +93,8 @@ public class Sandbox implements Scene {
 			window.close();
 		}
 
-		camera.update(theta);
-		screen.update(theta);
+		camera.update(delta);
+		screen.update(delta);
 	}
 
 	@Override

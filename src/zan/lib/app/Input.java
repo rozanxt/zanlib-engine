@@ -59,14 +59,17 @@ public class Input {
 
 	public Input(Window window) {
 		this.window = window;
+
 		keyEvents = new Event[GLFW_KEY_LAST];
 		for (int i = 0; i < GLFW_KEY_LAST; i++) {
 			keyEvents[i] = new Event();
 		}
+
 		mouseEvents = new Event[GLFW_MOUSE_BUTTON_LAST];
 		for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++) {
 			mouseEvents[i] = new Event();
 		}
+
 		charEvents = new ArrayList<Character>();
 	}
 
@@ -78,8 +81,11 @@ public class Input {
 			mouseX = (float) x.get(0);
 			mouseY = (float) y.get(0);
 		}
+
 		glfwSetKeyCallback(window.getHandle(), (window, key, scancode, action, mods) -> {
-			if (key == GLFW_KEY_UNKNOWN) return;
+			if (key == GLFW_KEY_UNKNOWN) {
+				return;
+			}
 			Event keyEvent = keyEvents[key];
 			keyEvent.mods = mods;
 			switch (action) {
@@ -94,8 +100,11 @@ public class Input {
 				break;
 			}
 		});
+
 		glfwSetMouseButtonCallback(window.getHandle(), (window, button, action, mods) -> {
-			if (button == GLFW_KEY_UNKNOWN) return;
+			if (button == GLFW_KEY_UNKNOWN) {
+				return;
+			}
 			Event mouseEvent = mouseEvents[button];
 			mouseEvent.mods = mods;
 			switch (action) {
@@ -107,19 +116,23 @@ public class Input {
 				break;
 			}
 		});
+
 		glfwSetCharCallback(window.getHandle(), (window, ch) -> {
 			charEvents.add((char) ch);
 		});
+
 		glfwSetCursorPosCallback(window.getHandle(), (window, x, y) -> {
 			mouseDeltaX = (float) x - mouseX;
 			mouseDeltaY = (float) y - mouseY;
 			mouseX = (float) x;
 			mouseY = (float) y;
 		});
+
 		glfwSetScrollCallback(window.getHandle(), (window, x, y) -> {
 			mouseScrollX = (float) x;
 			mouseScrollY = (float) y;
 		});
+
 		glfwSetCursorEnterCallback(window.getHandle(), (window, entered) -> {
 			if (entered) {
 				mouseEntered = true;
@@ -178,7 +191,7 @@ public class Input {
 	}
 
 	public boolean isKeyMods(int key, int mods) {
-		return (keyEvents[key].mods == mods);
+		return keyEvents[key].mods == mods;
 	}
 
 	public boolean isKeyPressed(int key) {
@@ -194,11 +207,11 @@ public class Input {
 	}
 
 	public boolean isKeyDown(int key) {
-		return (glfwGetKey(window.getHandle(), key) == GLFW_PRESS);
+		return glfwGetKey(window.getHandle(), key) == GLFW_PRESS;
 	}
 
 	public boolean isMouseMods(int button, int mods) {
-		return (mouseEvents[button].mods == mods);
+		return mouseEvents[button].mods == mods;
 	}
 
 	public boolean isMousePressed(int button) {
@@ -210,7 +223,7 @@ public class Input {
 	}
 
 	public boolean isMouseDown(int button) {
-		return (glfwGetMouseButton(window.getHandle(), button) == GLFW_PRESS);
+		return glfwGetMouseButton(window.getHandle(), button) == GLFW_PRESS;
 	}
 
 	public boolean hasMouseEntered() {
