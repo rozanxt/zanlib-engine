@@ -1,4 +1,4 @@
-package zan.lib.sbx.scene;
+package zan.lib.tst.scn;
 
 import static java.awt.Font.PLAIN;
 import static java.awt.Font.SANS_SERIF;
@@ -34,23 +34,24 @@ import java.util.Map;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import zan.lib.app.Application;
 import zan.lib.app.Engine;
 import zan.lib.app.Input;
 import zan.lib.app.Scene;
 import zan.lib.app.Window;
-import zan.lib.gfx.camera.Camera;
-import zan.lib.gfx.camera.ScreenCamera;
-import zan.lib.gfx.mesh.Mesh;
-import zan.lib.gfx.model.ModelLoader;
-import zan.lib.gfx.shader.Shader;
-import zan.lib.gfx.sprite.SpriteMesh;
-import zan.lib.gfx.text.TextFont;
-import zan.lib.gfx.text.TextMesh;
-import zan.lib.gfx.texture.Texture;
-import zan.lib.sbx.camera.DemonstrationCamera;
+import zan.lib.gfx.cam.Camera;
+import zan.lib.gfx.cam.ScreenCamera;
+import zan.lib.gfx.mdl.ModelLoader;
+import zan.lib.gfx.msh.Mesh;
+import zan.lib.gfx.shd.Shader;
+import zan.lib.gfx.spr.SpriteMesh;
+import zan.lib.gfx.tex.Texture;
+import zan.lib.gfx.txt.TextFont;
+import zan.lib.gfx.txt.TextMesh;
 import zan.lib.sfx.SoundData;
 import zan.lib.sfx.SoundSource;
 import zan.lib.sfx.SoundSystem;
+import zan.lib.tst.cam.DemonstrationCamera;
 
 public class Demonstration implements Scene {
 
@@ -339,8 +340,11 @@ public class Demonstration implements Scene {
 	}
 
 	public static void main(String[] args) {
+		Application application = new Application();
+		application.init();
+
 		Engine engine = new Engine(60, 50);
-		Window.Attributes attrib = new Window.Attributes(640, 480);
+		Window.Attributes attrib = new Window.Attributes(800, 600);
 		attrib.title = "Demonstration";
 		attrib.icon = "res/ico/icon.png";
 		Window window = new Window(attrib);
@@ -349,7 +353,9 @@ public class Demonstration implements Scene {
 		engine.setWindow(window);
 		engine.setInput(input);
 		engine.setScene(scene);
-		engine.start();
+		engine.run();
+
+		application.exit();
 	}
 
 }

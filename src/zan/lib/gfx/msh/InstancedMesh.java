@@ -1,4 +1,4 @@
-package zan.lib.gfx.mesh;
+package zan.lib.gfx.msh;
 
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;

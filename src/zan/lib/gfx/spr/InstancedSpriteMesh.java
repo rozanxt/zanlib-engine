@@ -1,4 +1,4 @@
-package zan.lib.gfx.sprite;
+package zan.lib.gfx.spr;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
@@ -13,8 +13,8 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.gfx.mesh.InstancedMesh;
-import zan.lib.gfx.sprite.InstancedSpriteMesh.Instance;
+import zan.lib.gfx.msh.InstancedMesh;
+import zan.lib.gfx.spr.InstancedSpriteMesh.Instance;
 
 public class InstancedSpriteMesh extends InstancedMesh<Instance> {
 

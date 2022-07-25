@@ -1,4 +1,4 @@
-package zan.lib.gfx.model;
+package zan.lib.gfx.mdl;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_INT;
@@ -17,9 +17,9 @@ import org.joml.Matrix4fc;
 import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.gfx.mesh.ArrayMesh;
-import zan.lib.gfx.mesh.InstancedMesh;
-import zan.lib.gfx.model.InstancedModelMesh.Instance;
+import zan.lib.gfx.mdl.InstancedModelMesh.Instance;
+import zan.lib.gfx.msh.ArrayMesh;
+import zan.lib.gfx.msh.InstancedMesh;
 
 public class InstancedModelMesh extends InstancedMesh<Instance> {
 

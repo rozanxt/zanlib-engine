@@ -1,4 +1,4 @@
-package zan.lib.gfx.text;
+package zan.lib.gfx.txt;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.gfx.texture.Texture;
+import zan.lib.gfx.tex.Texture;
 import zan.lib.utl.Utility;
 
 public class TextFont {

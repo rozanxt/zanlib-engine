@@ -1,4 +1,4 @@
-package zan.lib.gfx.mesh;
+package zan.lib.gfx.msh;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;

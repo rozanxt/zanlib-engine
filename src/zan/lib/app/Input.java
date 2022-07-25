@@ -142,6 +142,10 @@ public class Input {
 		});
 	}
 
+	void exit() {
+
+	}
+
 	void clear() {
 		for (int i = 0; i < GLFW_KEY_LAST; i++) {
 			keyEvents[i].clear();
@@ -156,10 +160,6 @@ public class Input {
 		mouseScrollY = 0.0f;
 		mouseEntered = false;
 		mouseLeft = false;
-	}
-
-	void exit() {
-
 	}
 
 	public void setInputMode(int mode, int value) {

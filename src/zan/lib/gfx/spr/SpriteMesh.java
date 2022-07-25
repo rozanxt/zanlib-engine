@@ -1,4 +1,4 @@
-package zan.lib.gfx.sprite;
+package zan.lib.gfx.spr;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -21,8 +21,8 @@ import java.util.List;
 
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.gfx.mesh.IndexMesh;
-import zan.lib.gfx.texture.Texture;
+import zan.lib.gfx.msh.IndexMesh;
+import zan.lib.gfx.tex.Texture;
 
 public class SpriteMesh extends IndexMesh {
 

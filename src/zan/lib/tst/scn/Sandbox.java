@@ -1,4 +1,4 @@
-package zan.lib.sbx.scene;
+package zan.lib.tst.scn;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F12;
@@ -22,19 +22,20 @@ import java.util.Map;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import zan.lib.app.Application;
 import zan.lib.app.Engine;
 import zan.lib.app.Input;
 import zan.lib.app.Scene;
 import zan.lib.app.Window;
-import zan.lib.gfx.camera.Camera;
-import zan.lib.gfx.camera.ScreenCamera;
-import zan.lib.gfx.model.InstancedModelMesh;
-import zan.lib.gfx.model.ModelLoader;
-import zan.lib.gfx.shader.Shader;
-import zan.lib.gfx.sprite.InstancedSpriteMesh;
-import zan.lib.gfx.sprite.SpriteMesh;
-import zan.lib.gfx.texture.Texture;
-import zan.lib.sbx.camera.InteractiveCamera;
+import zan.lib.gfx.cam.Camera;
+import zan.lib.gfx.cam.ScreenCamera;
+import zan.lib.gfx.mdl.InstancedModelMesh;
+import zan.lib.gfx.mdl.ModelLoader;
+import zan.lib.gfx.shd.Shader;
+import zan.lib.gfx.spr.InstancedSpriteMesh;
+import zan.lib.gfx.spr.SpriteMesh;
+import zan.lib.gfx.tex.Texture;
+import zan.lib.tst.cam.InteractiveCamera;
 
 public class Sandbox implements Scene {
 
@@ -113,7 +114,7 @@ public class Sandbox implements Scene {
 		mesh.process();
 
 		for (int i = 0; i < 6; i++) {
-			sprite.add(new InstancedSpriteMesh.Instance(120.0f * i + 30.0f, 0.0f, 2 * i));
+			sprite.add(new InstancedSpriteMesh.Instance(120.0f * i + window.getWidth() / 2.0f - 360.0f, 0.0f, 2 * i));
 		}
 		sprite.process();
 
@@ -151,8 +152,11 @@ public class Sandbox implements Scene {
 	}
 
 	public static void main(String[] args) {
+		Application application = new Application();
+		application.init();
+
 		Engine engine = new Engine(60, 20);
-		Window.Attributes attrib = new Window.Attributes(800, 600);
+		Window.Attributes attrib = new Window.Attributes(1280, 720);
 		attrib.title = "Sandbox";
 		Window window = new Window(attrib);
 		Input input = new Input(window);
@@ -160,7 +164,9 @@ public class Sandbox implements Scene {
 		engine.setWindow(window);
 		engine.setInput(input);
 		engine.setScene(scene);
-		engine.start();
+		engine.run();
+
+		application.exit();
 	}
 
 }

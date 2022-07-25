@@ -1,4 +1,4 @@
-package zan.lib.gfx.model;
+package zan.lib.gfx.mdl;
 
 import java.util.ArrayList;
 import java.util.List;

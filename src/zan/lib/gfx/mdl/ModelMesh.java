@@ -1,4 +1,4 @@
-package zan.lib.gfx.model;
+package zan.lib.gfx.mdl;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
@@ -16,7 +16,7 @@ import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.gfx.mesh.ArrayMesh;
+import zan.lib.gfx.msh.ArrayMesh;
 
 public class ModelMesh extends ArrayMesh {
 

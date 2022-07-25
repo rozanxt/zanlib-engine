@@ -1,4 +1,4 @@
-package zan.lib.gfx.texture;
+package zan.lib.gfx.tex;
 
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;

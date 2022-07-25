@@ -1,4 +1,4 @@
-package zan.lib.gfx.camera;
+package zan.lib.gfx.cam;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;

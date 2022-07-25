@@ -1,8 +1,9 @@
-package zan.lib.sbx.scene;
+package zan.lib.tst.scn;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F12;
 
+import zan.lib.app.Application;
 import zan.lib.app.Engine;
 import zan.lib.app.Input;
 import zan.lib.app.Scene;
@@ -44,6 +45,9 @@ public class Barebone implements Scene {
 	}
 
 	public static void main(String[] args) {
+		Application application = new Application();
+		application.init();
+
 		Engine engine = new Engine(60, 20);
 		Window.Attributes attrib = new Window.Attributes(640, 480);
 		attrib.title = "Barebone";
@@ -53,7 +57,9 @@ public class Barebone implements Scene {
 		engine.setWindow(window);
 		engine.setInput(input);
 		engine.setScene(scene);
-		engine.start();
+		engine.run();
+
+		application.exit();
 	}
 
 }

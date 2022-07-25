@@ -1,11 +1,5 @@
 package zan.lib.app;
 
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
-
-import org.lwjgl.glfw.GLFWErrorCallback;
-
 public class Engine implements Runnable {
 
 	private static final long NANOS_PER_SECOND = 1_000_000_000L;
@@ -20,29 +14,28 @@ public class Engine implements Runnable {
 	private int currentFPS;
 	private int currentUPS;
 
+	private boolean running;
+
 	public Engine(int targetFPS, int targetUPS) {
 		this.targetFPS = targetFPS;
 		this.targetUPS = targetUPS;
 	}
 
-	public void start() {
-		Thread thread = new Thread(this);
-		thread.start();
-	}
-
 	@Override
 	public void run() {
+		if (running) {
+			throw new IllegalStateException("Engine is already running!");
+		}
+		running = true;
+
 		init();
 		loop();
 		exit();
+
+		running = false;
 	}
 
 	private void init() {
-		GLFWErrorCallback.createPrint(System.err).set();
-		if (!glfwInit()) {
-			throw new IllegalStateException("Unable to initialize GLFW!");
-		}
-
 		window.init();
 		input.init();
 		scene.init();
@@ -104,12 +97,13 @@ public class Engine implements Runnable {
 		scene.exit();
 		input.exit();
 		window.exit();
-
-		glfwTerminate();
-		glfwSetErrorCallback(null).free();
 	}
 
 	public void setWindow(Window window) {
+		if (running) {
+			this.window.exit();
+			window.init();
+		}
 		this.window = window;
 	}
 
@@ -118,6 +112,10 @@ public class Engine implements Runnable {
 	}
 
 	public void setInput(Input input) {
+		if (running) {
+			this.input.exit();
+			input.init();
+		}
 		this.input = input;
 	}
 
@@ -126,6 +124,10 @@ public class Engine implements Runnable {
 	}
 
 	public void setScene(Scene scene) {
+		if (running) {
+			this.scene.exit();
+			scene.init();
+		}
 		this.scene = scene;
 	}
 

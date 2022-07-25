@@ -1,4 +1,4 @@
-package zan.lib.sbx.camera;
+package zan.lib.tst.cam;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 
@@ -7,7 +7,7 @@ import org.joml.Matrix4fc;
 
 import zan.lib.app.Input;
 import zan.lib.app.Window;
-import zan.lib.gfx.camera.Camera;
+import zan.lib.gfx.cam.Camera;
 import zan.lib.utl.Utility;
 
 public class DemonstrationCamera implements Camera {

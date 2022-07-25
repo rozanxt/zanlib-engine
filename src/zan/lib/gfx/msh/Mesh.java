@@ -1,4 +1,4 @@
-package zan.lib.gfx.mesh;
+package zan.lib.gfx.msh;
 
 public interface Mesh {
 

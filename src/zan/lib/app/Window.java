@@ -174,14 +174,14 @@ public class Window {
 		}
 	}
 
-	void refresh() {
-		glfwSwapBuffers(handle);
-		glfwPollEvents();
-	}
-
 	void exit() {
 		glfwFreeCallbacks(handle);
 		glfwDestroyWindow(handle);
+	}
+
+	void refresh() {
+		glfwSwapBuffers(handle);
+		glfwPollEvents();
 	}
 
 	public void setTitle(String title) {
