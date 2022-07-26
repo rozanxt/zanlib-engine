@@ -1,4 +1,4 @@
 ZanLibEngine
 ============
 
-ZanLibEngine is a framework and library for simple application development.
+A framework and library for simple application development.
