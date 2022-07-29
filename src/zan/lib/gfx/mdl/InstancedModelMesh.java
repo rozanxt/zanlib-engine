@@ -12,16 +12,16 @@ import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;
 import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.joml.Matrix4fc;
 import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
 
-import zan.lib.gfx.mdl.InstancedModelMesh.Instance;
 import zan.lib.gfx.msh.ArrayMesh;
 import zan.lib.gfx.msh.InstancedMesh;
 
-public class InstancedModelMesh extends InstancedMesh<Instance> {
+public class InstancedModelMesh extends InstancedMesh {
 
 	public static class Instance {
 
@@ -30,12 +30,12 @@ public class InstancedModelMesh extends InstancedMesh<Instance> {
 		private final Matrix4fc tfm;
 		private final Vector4fc clr;
 
-		private final int pid;
+		private final int sid;
 
-		public Instance(Matrix4fc tfm, Vector4fc clr, int pid) {
+		public Instance(Matrix4fc tfm, Vector4fc clr, int sid) {
 			this.tfm = tfm;
 			this.clr = clr;
-			this.pid = pid;
+			this.sid = sid;
 		}
 
 	}
@@ -71,8 +71,7 @@ public class InstancedModelMesh extends InstancedMesh<Instance> {
 		mesh.unbind();
 	}
 
-	@Override
-	public void process() {
+	public void build(List<Instance> instances) {
 		instanceCount = instances.size();
 
 		ByteBuffer instanceData = MemoryUtil.memAlloc(instanceCount * Instance.BYTES);
@@ -85,17 +84,15 @@ public class InstancedModelMesh extends InstancedMesh<Instance> {
 			for (int i = 0; i < 4; i++) {
 				instanceData.putFloat(instance.clr.get(i));
 			}
-			int pid = instance.pid;
+			int sid = instance.sid;
 			for (int i = 0; i < 4; i++) {
-				instanceData.putInt(pid % 255);
-				pid /= 255;
+				instanceData.putInt(sid % 255);
+				sid /= 255;
 			}
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, ibo);
 		glBufferData(GL_ARRAY_BUFFER, instanceData.flip(), GL_STREAM_DRAW);
 		MemoryUtil.memFree(instanceData);
-
-		instances.clear();
 	}
 
 }

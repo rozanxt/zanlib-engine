@@ -18,7 +18,7 @@ import org.lwjgl.system.MemoryUtil;
 
 public final class Utility {
 
-	public static final float eps = 1e-6f;
+	public static final float EPS = 1e-6f;
 
 	private Utility() {
 
@@ -57,7 +57,7 @@ public final class Utility {
 		float dot = a.dot(b);
 		float len = (float) (theta * Math.acos(dot));
 		Vector2fc u;
-		if (Math.abs(dot) > 1.0f - eps) {
+		if (Math.abs(dot) > 1.0f - EPS) {
 			u = new Vector2f(-a.y(), a.x());
 		} else {
 			u = new Vector2f(b).sub(new Vector2f(a).mul(dot)).normalize();
@@ -71,7 +71,7 @@ public final class Utility {
 		float dot = a.dot(b);
 		float len = (float) (theta * Math.acos(dot));
 		Vector3fc u;
-		if (Math.abs(dot) > 1.0f - eps) {
+		if (Math.abs(dot) > 1.0f - EPS) {
 			u = new Vector3f(-a.y(), a.x(), a.z());
 		} else {
 			u = new Vector3f(b).sub(new Vector3f(a).mul(dot)).normalize();
@@ -85,7 +85,7 @@ public final class Utility {
 		float dot = a.dot(b);
 		float len = (float) (theta * Math.acos(dot));
 		Vector4fc u;
-		if (Math.abs(dot) > 1.0f - eps) {
+		if (Math.abs(dot) > 1.0f - EPS) {
 			u = new Vector4f(-a.y(), a.x(), a.z(), a.w());
 		} else {
 			u = new Vector4f(b).sub(new Vector4f(a).mul(dot)).normalize();

@@ -7,7 +7,6 @@ import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.opengl.GL31.glDrawArraysInstanced;
 
 public abstract class ArrayMesh implements Mesh {
 
@@ -42,8 +41,8 @@ public abstract class ArrayMesh implements Mesh {
 		glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 	}
 
-	protected void draw(int instanceCount) {
-		glDrawArraysInstanced(GL_TRIANGLES, 0, vertexCount, instanceCount);
+	public int getVertexCount() {
+		return vertexCount;
 	}
 
 }

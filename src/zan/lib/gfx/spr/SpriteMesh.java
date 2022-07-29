@@ -12,7 +12,6 @@ import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -86,16 +85,16 @@ public class SpriteMesh extends IndexMesh {
 			}
 		}
 
-		mesh(vertices, elements);
+		buffer(vertices, elements);
 	}
 
 	public SpriteMesh(Texture sheet) {
 		this(sheet, 1, 1);
 	}
 
-	private void mesh(List<Vertex> vertices, List<Integer> elements) {
+	private void buffer(List<Vertex> vertices, List<Integer> indices) {
 		vertexCount = vertices.size();
-		elementCount = elements.size();
+		indexCount = indices.size();
 
 		glBindVertexArray(vao);
 
@@ -116,13 +115,13 @@ public class SpriteMesh extends IndexMesh {
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, Vertex.BYTES, 0 * Float.BYTES);
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, Vertex.BYTES, 2 * Float.BYTES);
 
-		IntBuffer elementData = MemoryUtil.memAllocInt(elementCount);
-		for (Integer element : elements) {
-			elementData.put(element);
+		IntBuffer indexData = MemoryUtil.memAllocInt(indexCount);
+		for (Integer index : indices) {
+			indexData.put(index);
 		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementData.flip(), GL_STATIC_DRAW);
-		MemoryUtil.memFree(elementData);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.flip(), GL_STATIC_DRAW);
+		MemoryUtil.memFree(indexData);
 
 		glBindVertexArray(0);
 	}
@@ -141,15 +140,10 @@ public class SpriteMesh extends IndexMesh {
 
 	@Override
 	public void draw() {
-		drawFrame(0);
+		draw(0);
 	}
 
-	@Override
-	public void draw(int instanceCount) {
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, instanceCount);
-	}
-
-	public void drawFrame(int frame) {
+	public void draw(int frame) {
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * frame * Integer.BYTES);
 	}
 

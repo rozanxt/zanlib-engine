@@ -1,22 +1,25 @@
 package zan.lib.gfx.spr;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
 import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
 
 import java.nio.FloatBuffer;
+import java.util.List;
 
 import org.lwjgl.system.MemoryUtil;
 
 import zan.lib.gfx.msh.InstancedMesh;
-import zan.lib.gfx.spr.InstancedSpriteMesh.Instance;
 
-public class InstancedSpriteMesh extends InstancedMesh<Instance> {
+public class InstancedSpriteMesh extends InstancedMesh {
 
 	public static class Instance {
 
@@ -59,8 +62,7 @@ public class InstancedSpriteMesh extends InstancedMesh<Instance> {
 		mesh.unbind();
 	}
 
-	@Override
-	public void process() {
+	public void build(List<Instance> instances) {
 		instanceCount = instances.size();
 
 		FloatBuffer instanceData = MemoryUtil.memAllocFloat(instanceCount * Instance.SLOTS);
@@ -77,8 +79,11 @@ public class InstancedSpriteMesh extends InstancedMesh<Instance> {
 		glBindBuffer(GL_ARRAY_BUFFER, ibo);
 		glBufferData(GL_ARRAY_BUFFER, instanceData.flip(), GL_STREAM_DRAW);
 		MemoryUtil.memFree(instanceData);
+	}
 
-		instances.clear();
+	@Override
+	public void draw() {
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, instanceCount);
 	}
 
 }

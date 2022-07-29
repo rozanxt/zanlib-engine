@@ -16,7 +16,9 @@ import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.joml.Matrix4f;
@@ -31,6 +33,7 @@ import zan.lib.gfx.cam.Camera;
 import zan.lib.gfx.cam.ScreenCamera;
 import zan.lib.gfx.mdl.InstancedModelMesh;
 import zan.lib.gfx.mdl.ModelLoader;
+import zan.lib.gfx.mdl.ModelMesh;
 import zan.lib.gfx.shd.Shader;
 import zan.lib.gfx.spr.InstancedSpriteMesh;
 import zan.lib.gfx.spr.SpriteMesh;
@@ -48,8 +51,11 @@ public class Sandbox implements Scene {
 
 	private Texture sheet;
 
-	private InstancedModelMesh mesh;
-	private InstancedSpriteMesh sprite;
+	private ModelMesh model;
+	private SpriteMesh sprite;
+
+	private InstancedModelMesh models;
+	private InstancedSpriteMesh sprites;
 
 	public Sandbox(Engine engine) {
 		this.engine = engine;
@@ -71,16 +77,23 @@ public class Sandbox implements Scene {
 
 		sheet = Texture.loadFromFile("res/img/animation.png");
 
-		mesh = new InstancedModelMesh(ModelLoader.loadFromFile("res/obj/toycar.obj"));
-		sprite = new InstancedSpriteMesh(new SpriteMesh(sheet, 12, 1));
+		model = ModelLoader.loadFromFile("res/obj/toycar.obj");
+		sprite = new SpriteMesh(sheet, 12, 1);
+
+		models = new InstancedModelMesh(model);
+		sprites = new InstancedSpriteMesh(sprite);
 	}
 
 	@Override
 	public void exit() {
-		for (Shader shader : shaders.values()) shader.delete();
+		for (Shader shader : shaders.values()) {
+			shader.delete();
+		}
 		sheet.delete();
-		mesh.delete();
+		model.delete();
 		sprite.delete();
+		models.delete();
+		sprites.delete();
 	}
 
 	@Override
@@ -109,14 +122,16 @@ public class Sandbox implements Scene {
 		camera.capture(theta);
 		screen.capture(theta);
 
-		mesh.add(new InstancedModelMesh.Instance(new Matrix4f(), new Vector4f(0.0f, 0.5f, 0.8f, 1.0f), 1));
-		mesh.add(new InstancedModelMesh.Instance(new Matrix4f().translate(1.5f, 3.0f, -0.5f).rotateX(2.0f).rotateY(1.0f), new Vector4f(1.0f, 0.5f, 0.0f, 1.0f), 2));
-		mesh.process();
+		List<InstancedModelMesh.Instance> modelInstances = new ArrayList<>();
+		modelInstances.add(new InstancedModelMesh.Instance(new Matrix4f(), new Vector4f(0.0f, 0.5f, 0.8f, 1.0f), 1));
+		modelInstances.add(new InstancedModelMesh.Instance(new Matrix4f().translate(1.5f, 3.0f, -0.5f).rotateX(2.0f).rotateY(1.0f), new Vector4f(1.0f, 0.5f, 0.0f, 1.0f), 2));
+		models.build(modelInstances);
 
+		List<InstancedSpriteMesh.Instance> spriteInstances = new ArrayList<>();
 		for (int i = 0; i < 6; i++) {
-			sprite.add(new InstancedSpriteMesh.Instance(120.0f * i + window.getWidth() / 2.0f - 360.0f, 0.0f, 2 * i));
+			spriteInstances.add(new InstancedSpriteMesh.Instance(120.0f * i + window.getWidth() / 2.0f - 360.0f, 0.0f, 2 * i));
 		}
-		sprite.process();
+		sprites.build(spriteInstances);
 
 		glClearColor(0.0f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -131,9 +146,9 @@ public class Sandbox implements Scene {
 		shader.bind();
 		shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
 		shader.setUniform("viewMatrix", camera.getViewMatrix());
-		mesh.bind();
-		mesh.draw();
-		mesh.unbind();
+		models.bind();
+		models.draw();
+		models.unbind();
 		shader.unbind();
 
 		glDisable(GL_DEPTH_TEST);
@@ -143,9 +158,9 @@ public class Sandbox implements Scene {
 		shader.bind();
 		shader.setUniform("projectionMatrix", screen.getProjectionMatrix());
 		shader.setUniform("viewMatrix", screen.getViewMatrix());
-		sprite.bind();
-		sprite.draw();
-		sprite.unbind();
+		sprites.bind();
+		sprites.draw();
+		sprites.unbind();
 		shader.unbind();
 
 		glDisable(GL_BLEND);

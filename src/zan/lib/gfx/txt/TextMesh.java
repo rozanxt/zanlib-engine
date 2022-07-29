@@ -55,12 +55,7 @@ public class TextMesh extends IndexMesh {
 	private int line;
 
 	public TextMesh(TextFont font) {
-		text = "";
 		this.font = font;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 
 	public void setFont(TextFont font) {
@@ -71,7 +66,9 @@ public class TextMesh extends IndexMesh {
 		this.maxWidth = maxWidth;
 	}
 
-	public void build() {
+	public void build(String text) {
+		this.text = text;
+
 		Texture texture = font.getTexture();
 		float fontWidth = texture.getWidth();
 		float fontHeight = texture.getHeight();
@@ -111,12 +108,12 @@ public class TextMesh extends IndexMesh {
 			}
 		}
 
-		mesh(vertices, elements);
+		buffer(vertices, elements);
 	}
 
-	private void mesh(List<Vertex> vertices, List<Integer> elements) {
+	private void buffer(List<Vertex> vertices, List<Integer> indices) {
 		vertexCount = vertices.size();
-		elementCount = elements.size();
+		indexCount = indices.size();
 
 		glBindVertexArray(vao);
 
@@ -137,13 +134,13 @@ public class TextMesh extends IndexMesh {
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, Vertex.BYTES, 0 * Float.BYTES);
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, Vertex.BYTES, 2 * Float.BYTES);
 
-		IntBuffer elementData = MemoryUtil.memAllocInt(elementCount);
-		for (Integer element : elements) {
-			elementData.put(element);
+		IntBuffer indexData = MemoryUtil.memAllocInt(indexCount);
+		for (Integer index : indices) {
+			indexData.put(index);
 		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementData.flip(), GL_STREAM_DRAW);
-		MemoryUtil.memFree(elementData);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.flip(), GL_STREAM_DRAW);
+		MemoryUtil.memFree(indexData);
 
 		glBindVertexArray(0);
 	}

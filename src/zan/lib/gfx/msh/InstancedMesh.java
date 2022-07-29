@@ -1,30 +1,25 @@
 package zan.lib.gfx.msh;
 
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL31.glDrawArraysInstanced;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public abstract class InstancedMesh<T> implements Mesh {
+public abstract class InstancedMesh implements Mesh {
 
 	protected final ArrayMesh mesh;
 
 	protected final int ibo;
-
-	protected final List<T> instances;
 
 	protected int instanceCount;
 
 	public InstancedMesh(ArrayMesh mesh) {
 		this.mesh = mesh;
 		ibo = glGenBuffers();
-		instances = new ArrayList<>();
 	}
 
 	@Override
 	public void delete() {
-		mesh.delete();
 		glDeleteBuffers(ibo);
 	}
 
@@ -40,13 +35,11 @@ public abstract class InstancedMesh<T> implements Mesh {
 
 	@Override
 	public void draw() {
-		mesh.draw(instanceCount);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, mesh.getVertexCount(), instanceCount);
 	}
 
-	public void add(T instance) {
-		instances.add(instance);
+	public int getInstanceCount() {
+		return instanceCount;
 	}
-
-	public abstract void process();
 
 }

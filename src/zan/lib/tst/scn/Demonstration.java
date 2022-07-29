@@ -120,12 +120,10 @@ public class Demonstration implements Scene {
 
 		font = new TextFont(new Font(SANS_SERIF, PLAIN, 20));
 		text = new TextMesh(font);
-		text.setText(content);
 		text.setMaxWidth(450.0f);
-		text.build();
+		text.build(content);
 		help = new TextMesh(font);
-		help.setText("F1: Help");
-		help.build();
+		help.build("F1: Help");
 		ufps = new TextMesh(font);
 
 		showHelp = false;
@@ -158,9 +156,9 @@ public class Demonstration implements Scene {
 
 		if (input.isKeyReleased(GLFW_KEY_F1)) {
 			if (showHelp) {
-				help.setText("F1: Help");
+				help.build("F1: Help");
 			} else {
-				help.setText("F1: Help\n" +
+				help.build("F1: Help\n" +
 					"F2: Toggle shading\n" +
 					"F3: Toggle texture\n" +
 					"F4: Toggle music\n" +
@@ -172,7 +170,6 @@ public class Demonstration implements Scene {
 					"Left / right arrow key: Move sprite\n");
 			}
 			showHelp = !showHelp;
-			help.build();
 		} else if (input.isKeyReleased(GLFW_KEY_F2)) {
 			if (cubeShader == shaders.get("standard")) {
 				cubeShader = shaders.get("default");
@@ -232,12 +229,10 @@ public class Demonstration implements Scene {
 			}
 		}
 		if (text.getText() != content) {
-			text.setText(content);
-			text.build();
+			text.build(content);
 		}
 
-		ufps.setText(String.format("FPS: %d\nUPS: %d", engine.getCurrentFPS(), engine.getCurrentUPS()));
-		ufps.build();
+		ufps.build(String.format("FPS: %d\nUPS: %d", engine.getCurrentFPS(), engine.getCurrentUPS()));
 
 		camera.update(delta);
 		screen.update(delta);
@@ -300,7 +295,7 @@ public class Demonstration implements Scene {
 		shader.setUniform("enableTexture", true);
 		shader.setUniform("textureUnit", 0);
 		sprite.bind();
-		sprite.drawFrame(spriteFrame);
+		sprite.draw(spriteFrame);
 		sprite.unbind();
 		shader.unbind();
 
